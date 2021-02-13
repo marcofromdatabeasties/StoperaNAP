@@ -1,2 +1,2 @@
-#define ST_SSID "somenetworkaap"
+#define ST_SSID "somenetwork"
 #define PASSWORD "very_secret"
