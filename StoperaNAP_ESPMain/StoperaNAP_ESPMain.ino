@@ -19,6 +19,12 @@
 #include <WiFi.h>
 #include "Keys.h"
 
+#ifndef ST_SSID
+#define ST_SSID "somenetwork"
+#define PASSWORD "very_secret"
+#endif
+
+
 #define PUMP 23 //pomp GPIO23, om water bij te pompen
 #define SOLENOID 22 //solenoid GPIO24, water weg te laten lopen.
 #define WIFI_ON 21 //Wifi active led indicator
