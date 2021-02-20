@@ -1,5 +1,3 @@
-
-
 /**
    Programma dat aan de hand van de (deels) verwachte waterstanden boven NAP in het Stopera monument de juiste waarde laat zien.
 
@@ -18,7 +16,9 @@
 
 */
 #include <WiFi.h>
+#include <CSV_Parser.h>
 #include <dummy.h>
+#include <HTTPClient.h>
 #include "Keys.h"
 
 #ifndef ST_SSID
@@ -26,9 +26,8 @@
 #define PASSWORD "very_secret"
 #endif
 
-
 #define PUMP 23 //pomp GPIO23, om water bij te pompen
-#define SOLENOID 22 //solenoid GPIO24, water weg te laten lopen.
+#define SOLENOID 22 //solenoid GPIO22, water weg te laten lopen.
 #define WIFI_ON 21 //inet active led indicator
 #define ERROR_ON 19 //error led indicator
 #define PRESSURE 36 // FSR op ADC1_0, meet de hoeveelheid water in kolom.
@@ -39,10 +38,12 @@
 #define W3_GOOD 2 // world 3: water in kolom goed tov NAP/water in column ok
 #define W4_ERROR 3 // world 4: water in kolom veranderd niet / meting onjuist/ error world: water is not moving or measurement is off.
 #define START 4 //world 5: starting (INet)
-#define NOWHERE 5 //world 6: starting (INet)
+#define NOWHERE 5 //boot
 
-#define C_HEIGHT 120 // 1.2 meter
-#define C_R 5 //5 cm radius
+//set on site with real values RATIO becomes 1
+#define C_HEIGHT_NAP 40.0f // 0.4 meter
+#define C_R 0.2f // 5 cm radius
+#define C_RATIO 0.24f // 1.2 meter / 5 meter
 
 #define FLOW_IN 7 //liter per minute.
 #define FLOW_OUT 5 //liter per minute.
@@ -50,15 +51,17 @@
 uint8_t volatile world = NOWHERE; // we start from nowhere
 uint8_t volatile next_world = START;
 
-uint16_t volatile pressureNminus2;
-uint16_t volatile pressureNminus1;
-uint16_t volatile pressureCurrent;
+float volatile pressureNminus2;
+float volatile pressureNminus1;
+float volatile pressureCurrent;
 
 SemaphoreHandle_t xSemaphore_world = NULL; //mutex for worldchanges
 SemaphoreHandle_t xSemaphore_P = NULL; //mutex for new pressure values
 SemaphoreHandle_t xSemaphore_INET = NULL; //mutex for connection status
 
-bool addNewPressureValue(uint16_t pressureNew) {
+HTTPClient http;
+
+bool addNewPressureValue(float pressureNew) {
   if ( xSemaphore_P != NULL ) {
     /* See if we can obtain the semaphore.  If the semaphore is not
       available wait 10 ticks to see if it becomes free. */
@@ -72,6 +75,44 @@ bool addNewPressureValue(uint16_t pressureNew) {
 
   } else {
     return false; //error setup not completed.
+  }
+}
+
+void getSealevelHeightNAP(void * parameter) {
+  // gets the sealevel and translates it into pressure of the column.
+  if ( xSemaphore_INET != NULL ) {
+    if ( xSemaphoreTake( xSemaphore_INET, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+      if (WiFi.status() == WL_CONNECTED) {
+        http.begin("http://waterinfo.rws.nl/api/Download/CSV?expertParameter=Waterhoogte___20Oppervlaktewater___20t.o.v.___20Normaal___20Amsterdams___20Peil___20in___20cm&locationSlug=IJmuiden-Buitenhaven(IJMH)&timehorizon=-1,0"); //URL waterlevel
+        int httpCode = http.GET(); //Make the request
+        if (httpCode == 200) {
+          String payload = http.getString();
+          //no longer needed to hold the inet-connection, we got what we need. 
+          xSemaphoreGive( xSemaphore_INET );
+          //Datum;Tijd;Parameter;Locatie;Meting;Astronomisch getijden;Eenheid;Windrichting;Windrichting eenheid;Bemonsteringshoogte;Referentievlak;
+          CSV_Parser cp(payload.c_str(), /*format*/ "ssssfdsdsss-",  /*has_header*/ true, /*delimiter*/ ';');
+          //char **dates = (char**)cp["Datum"];
+          //char **times = (char**)cp["Tijd"];
+          //char **params = (char**)cp["Parameter"];
+          //char **locs = (char**)cp["Locatie"];
+          float **measurements = (float**)cp["Meting"];
+          //int **astrs = (int**)cp["Astronomisch getijden"];
+          //char **units = (char**)cp["Eenheid"];
+          //int **dirs = (int**)cp["Windrichting eenheid"];
+          //char **mheights = (char**)cp["Bemonsteringshoogte"];
+          char **refs = (char**)cp["Referentievlak"];
+
+          //start from the last row upwards, the file contains estimates based upon calculations (astronomical)
+          for (int i = cp.getRowsCount()-1; i >= 0; i++) {
+            if (strcmp(refs[i],"NAP")) {
+               float p = ((*measurements[i] * C_RATIO + C_HEIGHT_NAP)* 3.1415926f * pow(C_R, 2)) / 1000.0f; //h * pi * r² (volume cylinder) 1000cm³ = 1 kg = liter
+               //((40 + (88 * .24) * 3.14 * 0,2²) / 1000 = .019
+               addNewPressureValue(p);  
+            }
+          }
+        }
+      }
+    }
   }
 }
 
@@ -105,6 +146,17 @@ void handleWorlds(void * parameter) {
   for ( ;; ) {
     if ( xSemaphore_world != NULL ) {
       if ( xSemaphoreTake( xSemaphore_world, ( TickType_t ) 100 ) == pdTRUE ) {
+        //check the inet connection
+        if ( xSemaphore_INET != NULL ) {
+          if ( xSemaphoreTake( xSemaphore_INET, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+            //we could be getting the sealevel at this point, so wait a little longer.
+            if (WiFi.status() != WL_CONNECTED) {
+              next_world = START;
+            }
+            xSemaphoreGive( xSemaphore_INET );
+          }
+        }
+
         if (world != next_world) {
           switch (next_world) {
             case W1_LAAG:
