@@ -26,6 +26,8 @@
 #define PASSWORD "very_secret"
 #endif
 
+#define IJMUIDEN "http://waterinfo.rws.nl/api/Download/CSV?expertParameter=Waterhoogte___20Oppervlaktewater___20t.o.v.___20Normaal___20Amsterdams___20Peil___20in___20cm&locationSlug=IJmuiden-Buitenhaven(IJMH)&timehorizon=-1,0"
+
 #define PUMP 23 //pomp GPIO23, om water bij te pompen
 #define SOLENOID 22 //solenoid GPIO22, water weg te laten lopen.
 #define WIFI_ON 21 //inet active led indicator
@@ -33,20 +35,26 @@
 #define PRESSURE 36 // FSR op ADC1_0, meet de hoeveelheid water in kolom.
 #define MAX_PRES 4095 //max conversie waarde: 0-4095 bij 0.1-3.2 volt.
 
-#define W1_LAAG 0 // world 1: water in kolom te laag tov NAP/ water in column to low
-#define W2_HOOG 1 // world 2: water in kolom te hoog tov NAP/water in column to high
+
+#define W1_LOW 0 // world 1: water in kolom te laag tov NAP/ water in column to low
+#define W2_HIGH 1 // world 2: water in kolom te hoog tov NAP/water in column to high
 #define W3_GOOD 2 // world 3: water in kolom goed tov NAP/water in column ok
 #define W4_ERROR 3 // world 4: water in kolom veranderd niet / meting onjuist/ error world: water is not moving or measurement is off.
 #define START 4 //world 5: starting (INet)
 #define NOWHERE 5 //boot
 
+//change on release
 //set on site with real values RATIO becomes 1
-#define C_HEIGHT_NAP 40.0f // 0.4 meter
-#define C_R 0.2f // 5 cm radius
-#define C_RATIO 0.24f // 1.2 meter / 5 meter
+#define C_HEIGHT_NAP 63.5f // 0.6 meter
+#define C_R 5.0f // 5 cm radius
+#define C_RATIO 0.254f // 1.5 meter / 5 meter
+//((127 * 3.14 * 25) / 1000 = 9.9 kg
+#define C_HEIGHT_MAX 127f // 1.27
+#define C_P_MAX 9.9f // 1.27cm equals 10kg
 
 #define FLOW_IN 7 //liter per minute.
 #define FLOW_OUT 5 //liter per minute.
+// end change on release
 
 uint8_t volatile world = NOWHERE; // we start from nowhere
 uint8_t volatile next_world = START;
@@ -54,6 +62,9 @@ uint8_t volatile next_world = START;
 float volatile pressureNminus2;
 float volatile pressureNminus1;
 float volatile pressureCurrent;
+
+float* pressureWanted;
+
 
 SemaphoreHandle_t xSemaphore_world = NULL; //mutex for worldchanges
 SemaphoreHandle_t xSemaphore_P = NULL; //mutex for new pressure values
@@ -78,16 +89,31 @@ bool addNewPressureValue(float pressureNew) {
   }
 }
 
+bool setWorld(uint8_t world) {
+  if ( xSemaphore_world != NULL ) {
+    /* See if we can obtain the semaphore.  If the semaphore is not
+      available wait 10 ticks to see if it becomes free. */
+    if ( xSemaphoreTake( xSemaphore_world, ( TickType_t ) 30 ) == pdTRUE ) {
+      next_world = world;
+      xSemaphoreGive( xSemaphore_world );
+    }
+    return true;
+
+  } else {
+    return false; //error setup not completed.
+  }
+}
+
 void getSealevelHeightNAP(void * parameter) {
   // gets the sealevel and translates it into pressure of the column.
   if ( xSemaphore_INET != NULL ) {
     if ( xSemaphoreTake( xSemaphore_INET, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
       if (WiFi.status() == WL_CONNECTED) {
-        http.begin("http://waterinfo.rws.nl/api/Download/CSV?expertParameter=Waterhoogte___20Oppervlaktewater___20t.o.v.___20Normaal___20Amsterdams___20Peil___20in___20cm&locationSlug=IJmuiden-Buitenhaven(IJMH)&timehorizon=-1,0"); //URL waterlevel
+        http.begin(IJMUIDEN); //URL waterlevel
         int httpCode = http.GET(); //Make the request
         if (httpCode == 200) {
           String payload = http.getString();
-          //no longer needed to hold the inet-connection, we got what we need. 
+          //no longer needed to hold the inet-connection, we got what we need.
           xSemaphoreGive( xSemaphore_INET );
           //Datum;Tijd;Parameter;Locatie;Meting;Astronomisch getijden;Eenheid;Windrichting;Windrichting eenheid;Bemonsteringshoogte;Referentievlak;
           CSV_Parser cp(payload.c_str(), /*format*/ "ssssfdsdsss-",  /*has_header*/ true, /*delimiter*/ ';');
@@ -103,11 +129,31 @@ void getSealevelHeightNAP(void * parameter) {
           char **refs = (char**)cp["Referentievlak"];
 
           //start from the last row upwards, the file contains estimates based upon calculations (astronomical)
-          for (int i = cp.getRowsCount()-1; i >= 0; i++) {
-            if (strcmp(refs[i],"NAP")) {
-               float p = ((*measurements[i] * C_RATIO + C_HEIGHT_NAP)* 3.1415926f * pow(C_R, 2)) / 1000.0f; //h * pi * r² (volume cylinder) 1000cm³ = 1 kg = liter
-               //((40 + (88 * .24) * 3.14 * 0,2²) / 1000 = .019
-               addNewPressureValue(p);  
+          for (int i = cp.getRowsCount() - 1; i >= 0; i++) {
+            if (strcmp(refs[i], "NAP")) {
+              float p = ((*measurements[i] * C_RATIO + C_HEIGHT_NAP) * 3.1415926f * pow(C_R, 2)) / 1000.0f; //h * pi * r² (volume cylinder) 1000cm³ = 1 kg = liter
+              //((40 + (88 * .24) * 3.14 * 0,2²) / 1000 = .019
+              float p_upper = p * 1.025f; //+2.5 % error
+              float p_lower = p * 0.975f; //-2.5 % error
+               
+              boolean error = false;
+              if ( xSemaphore_world != NULL && xSemaphore_P != NULL) {
+                if ( xSemaphoreTake( xSemaphore_world, ( TickType_t ) 100 / portTICK_PERIOD_MS ) == pdTRUE ) {
+                  if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 100 / portTICK_PERIOD_MS ) == pdTRUE ) {
+                    *pressureWanted = p;
+                    //pressure is set, release semaphore
+                    xSemaphoreGive(xSemaphore_P);
+                    if (p_lower > pressureCurrent ) {
+                      error = setWorld(W1_LOW);
+                    } else if (p_upper < pressureCurrent) {
+                      error = setWorld(W2_HIGH);
+                    } else {
+                      error = setWorld(W3_GOOD);
+                    }
+                  }
+                  xSemaphoreGive(xSemaphore_world);
+                }
+              }
             }
           }
         }
@@ -159,10 +205,10 @@ void handleWorlds(void * parameter) {
 
         if (world != next_world) {
           switch (next_world) {
-            case W1_LAAG:
+            case W1_LOW:
 
               break;
-            case W2_HOOG:
+            case W2_HIGH:
 
               break;
             case W3_GOOD:
@@ -192,6 +238,24 @@ void handleWorlds(void * parameter) {
   }
 }
 
+float map_f(float x, float in_min, float in_max, float out_min, float out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+void pressureReader(void* parameter) {
+  while (true) {
+    if ( xSemaphore_P != NULL) {
+      if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 100 / portTICK_PERIOD_MS ) == pdTRUE ) {
+        //read 12bit ADC > max 4095
+        float p_now = map_f(float(analogRead(PRESSURE)), 0.0, 4095.0, 0.0, C_P_MAX);
+        bool error = addNewPressureValue(p_now);
+        xSemaphoreGive( xSemaphore_P );
+      }
+    }
+    vTaskDelay(30000 / portTICK_PERIOD_MS); // wait 1/2 minute
+  }
+}
+
 
 void setup() {
   pinMode(PUMP, OUTPUT);
@@ -199,7 +263,7 @@ void setup() {
   pinMode(WIFI_ON, OUTPUT);
 
   digitalWrite(PUMP, LOW); // pump off
-  digitalWrite(SOLENOID, LOW); // solenoid closed
+  digitalWrite(SOLENOID, HIGH); // solenoid closed, change on release
   digitalWrite(WIFI_ON, LOW); // INET off
   digitalWrite(ERROR_ON, LOW); // INET off
 
@@ -207,6 +271,7 @@ void setup() {
   xSemaphore_P = xSemaphoreCreateMutex();
   xSemaphore_INET = xSemaphoreCreateMutex();
 
+  //handles the state.
   xTaskCreate(
     handleWorlds,
     "Worlds",
@@ -215,6 +280,17 @@ void setup() {
     1,
     NULL
   );
+  //handels reading of current column height in kg.
+  xTaskCreate(
+    pressureReader,
+    "Pressure",
+    1000,
+    NULL,
+    1,
+    NULL
+  );
+
+
 }
 
 void loop() {
