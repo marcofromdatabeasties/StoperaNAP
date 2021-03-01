@@ -106,52 +106,53 @@ bool setWorld(uint8_t world) {
 
 void getSealevelHeightNAP(void * parameter) {
   // gets the sealevel and translates it into pressure of the column.
-  if ( xSemaphore_INET != NULL ) {
-    if ( xSemaphoreTake( xSemaphore_INET, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
-      if (WiFi.status() == WL_CONNECTED) {
-        http.begin(IJMUIDEN); //URL waterlevel
-        int httpCode = http.GET(); //Make the request
-        if (httpCode == 200) {
-          String payload = http.getString();
-          //no longer needed to hold the inet-connection, we got what we need.
-          xSemaphoreGive( xSemaphore_INET );
-          //Datum;Tijd;Parameter;Locatie;Meting;Astronomisch getijden;Eenheid;Windrichting;Windrichting eenheid;Bemonsteringshoogte;Referentievlak;
-          CSV_Parser cp(payload.c_str(), /*format*/ "ssssfdsdsss-",  /*has_header*/ true, /*delimiter*/ ';');
-          //char **dates = (char**)cp["Datum"];
-          //char **times = (char**)cp["Tijd"];
-          //char **params = (char**)cp["Parameter"];
-          //char **locs = (char**)cp["Locatie"];
-          float **measurements = (float**)cp["Meting"];
-          //int **astrs = (int**)cp["Astronomisch getijden"];
-          //char **units = (char**)cp["Eenheid"];
-          //int **dirs = (int**)cp["Windrichting eenheid"];
-          //char **mheights = (char**)cp["Bemonsteringshoogte"];
-          char **refs = (char**)cp["Referentievlak"];
+  while (true) {
+    if ( xSemaphore_INET != NULL ) {
+      if ( xSemaphoreTake( xSemaphore_INET, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+        if (WiFi.status() == WL_CONNECTED) {
+          http.begin(IJMUIDEN); //URL waterlevel
+          int httpCode = http.GET(); //Make the request
+          if (httpCode == 200) {
+            String payload = http.getString();
+            //no longer needed to hold the inet-connection, we got what we need.
+            xSemaphoreGive( xSemaphore_INET );
+            //Datum;Tijd;Parameter;Locatie;Meting;Astronomisch getijden;Eenheid;Windrichting;Windrichting eenheid;Bemonsteringshoogte;Referentievlak;
+            CSV_Parser cp(payload.c_str(), /*format*/ "ssssfdsdsss-",  /*has_header*/ true, /*delimiter*/ ';');
+            //char **dates = (char**)cp["Datum"];
+            //char **times = (char**)cp["Tijd"];
+            //char **params = (char**)cp["Parameter"];
+            //char **locs = (char**)cp["Locatie"];
+            float **measurements = (float**)cp["Meting"];
+            //int **astrs = (int**)cp["Astronomisch getijden"];
+            //char **units = (char**)cp["Eenheid"];
+            //int **dirs = (int**)cp["Windrichting eenheid"];
+            //char **mheights = (char**)cp["Bemonsteringshoogte"];
+            char **refs = (char**)cp["Referentievlak"];
 
-          //start from the last row upwards, the file contains estimates based upon calculations (astronomical)
-          for (int i = cp.getRowsCount() - 1; i >= 0; i++) {
-            if (strcmp(refs[i], "NAP")) {
-              float p = ((*measurements[i] * C_RATIO + C_HEIGHT_NAP) * 3.1415926f * pow(C_R, 2)) / 1000.0f; //h * pi * r² (volume cylinder) 1000cm³ = 1 kg = liter
-              //((40 + (88 * .24) * 3.14 * 0,2²) / 1000 = .019
-              float p_upper = p * 1.025f; //+2.5 % error
-              float p_lower = p * 0.975f; //-2.5 % error
-               
-              boolean error = false;
-              if ( xSemaphore_world != NULL && xSemaphore_P != NULL) {
-                if ( xSemaphoreTake( xSemaphore_world, ( TickType_t ) 100 / portTICK_PERIOD_MS ) == pdTRUE ) {
-                  if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 100 / portTICK_PERIOD_MS ) == pdTRUE ) {
-                    *pressureWanted = p;
-                    //pressure is set, release semaphore
-                    xSemaphoreGive(xSemaphore_P);
-                    if (p_lower > pressureCurrent ) {
-                      error = setWorld(W1_LOW);
-                    } else if (p_upper < pressureCurrent) {
-                      error = setWorld(W2_HIGH);
-                    } else {
-                      error = setWorld(W3_GOOD);
+            //start from the last row upwards, the file contains estimates based upon calculations (astronomical)
+            for (int i = cp.getRowsCount() - 1; i >= 0; i++) {
+              if (strcmp(refs[i], "NAP")) {
+                float p = ((*measurements[i] * C_RATIO + C_HEIGHT_NAP) * 3.1415926f * pow(C_R, 2)) / 1000.0f; //h * pi * r² (volume cylinder) 1000cm³ = 1 kg = liter
+                float p_upper = p * 1.025f; //+2.5 % error
+                float p_lower = p * 0.975f; //-2.5 % error
+
+                boolean error = false;
+                if ( xSemaphore_world != NULL && xSemaphore_P != NULL) {
+                  if ( xSemaphoreTake( xSemaphore_world, ( TickType_t ) 100 / portTICK_PERIOD_MS ) == pdTRUE ) {
+                    if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 100 / portTICK_PERIOD_MS ) == pdTRUE ) {
+                      *pressureWanted = p;
+                      //pressure is set, release semaphore
+                      xSemaphoreGive(xSemaphore_P);
+                      if (p_lower > pressureCurrent ) {
+                        error = setWorld(W1_LOW);
+                      } else if (p_upper < pressureCurrent) {
+                        error = setWorld(W2_HIGH);
+                      } else {
+                        error = setWorld(W3_GOOD);
+                      }
                     }
+                    xSemaphoreGive(xSemaphore_world);
                   }
-                  xSemaphoreGive(xSemaphore_world);
                 }
               }
             }
@@ -159,7 +160,9 @@ void getSealevelHeightNAP(void * parameter) {
         }
       }
     }
+    vTaskDelay(10 * 60000 / portTICK_PERIOD_MS); // wait 10 minutes
   }
+  vTaskDelete(NULL);
 }
 
 void initiateINETConnection(void * parameter) {
@@ -189,7 +192,7 @@ void initiateINETConnection(void * parameter) {
 
 void handleWorlds(void * parameter) {
   //handles the world changes and fires the corresponding tasks
-  for ( ;; ) {
+  while (true) {
     if ( xSemaphore_world != NULL ) {
       if ( xSemaphoreTake( xSemaphore_world, ( TickType_t ) 100 ) == pdTRUE ) {
         //check the inet connection
@@ -290,7 +293,14 @@ void setup() {
     NULL
   );
 
-
+  xTaskCreate(
+    getSealevelHeightNAP,
+    "Level",
+    1000,
+    NULL,
+    1,
+    NULL
+  );
 }
 
 void loop() {
