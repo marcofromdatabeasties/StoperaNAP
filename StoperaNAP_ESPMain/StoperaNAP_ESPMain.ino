@@ -46,36 +46,38 @@
 //change on release
 //set on site with real values RATIO becomes 1
 #define C_HEIGHT_NAP 63.5f // 0.6 meter
-#define C_R 5.0f // 5 cm radius
+#define C_R 3.75f //  cm radius
 #define C_RATIO 0.254f // 1.5 meter / 5 meter
 //((127 * 3.14 * 25) / 1000 = 9.9 kg
-#define C_HEIGHT_MAX 127f // 1.27
+#define C_HEIGHT_MAX 127f // 1.27m
 #define C_P_MAX 9.9f // 1.27cm equals 10kg
 
 #define FLOW_IN 7 //liter per minute.
 #define FLOW_OUT 5 //liter per minute.
 // end change on release
-
+//holds the state in the form of Kripke worlds
 uint8_t volatile world = NOWHERE; // we start from nowhere
 uint8_t volatile next_world = START;
 
+//holds the pressure of the column 
 float volatile pressureNminus2;
 float volatile pressureNminus1;
 float volatile pressureCurrent;
 
+//holds the presure the is respresented by the height of the seawaterlevel.
 float* pressureWanted;
-
 
 SemaphoreHandle_t xSemaphore_world = NULL; //mutex for worldchanges
 SemaphoreHandle_t xSemaphore_P = NULL; //mutex for new pressure values
 SemaphoreHandle_t xSemaphore_INET = NULL; //mutex for connection status
 
+//does http handling
 HTTPClient http;
 
 bool addNewPressureValue(float pressureNew) {
   if ( xSemaphore_P != NULL ) {
     /* See if we can obtain the semaphore.  If the semaphore is not
-      available wait 10 ticks to see if it becomes free. */
+      available wait 30 ticks to see if it becomes free. */
     if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 30 ) == pdTRUE ) {
       pressureNminus1 = pressureCurrent;
       pressureNminus2 = pressureNminus1;
@@ -292,7 +294,7 @@ void setup() {
     1,
     NULL
   );
-
+  //handles reading of waterlevel
   xTaskCreate(
     getSealevelHeightNAP,
     "Level",
