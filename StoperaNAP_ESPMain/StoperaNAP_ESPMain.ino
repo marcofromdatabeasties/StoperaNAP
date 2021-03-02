@@ -59,13 +59,13 @@
 uint8_t volatile world = NOWHERE; // we start from nowhere
 uint8_t volatile next_world = START;
 
-//holds the pressure of the column 
+//holds the pressure of the column
 float volatile pressureNminus2;
 float volatile pressureNminus1;
 float volatile pressureCurrent;
 
 //holds the presure the is respresented by the height of the seawaterlevel.
-float* pressureWanted;
+float pressureWanted;
 
 SemaphoreHandle_t xSemaphore_world = NULL; //mutex for worldchanges
 SemaphoreHandle_t xSemaphore_P = NULL; //mutex for new pressure values
@@ -139,21 +139,11 @@ void getSealevelHeightNAP(void * parameter) {
                 float p_lower = p * 0.975f; //-2.5 % error
 
                 boolean error = false;
-                if ( xSemaphore_world != NULL && xSemaphore_P != NULL) {
-                  if ( xSemaphoreTake( xSemaphore_world, ( TickType_t ) 100 / portTICK_PERIOD_MS ) == pdTRUE ) {
-                    if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 100 / portTICK_PERIOD_MS ) == pdTRUE ) {
-                      *pressureWanted = p;
-                      //pressure is set, release semaphore
-                      xSemaphoreGive(xSemaphore_P);
-                      if (p_lower > pressureCurrent ) {
-                        error = setWorld(W1_LOW);
-                      } else if (p_upper < pressureCurrent) {
-                        error = setWorld(W2_HIGH);
-                      } else {
-                        error = setWorld(W3_GOOD);
-                      }
-                    }
-                    xSemaphoreGive(xSemaphore_world);
+                if ( xSemaphore_P != NULL) {
+                  if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+                    pressureWanted = min(C_P_MAX, p);
+                    //pressure is set, release semaphore
+                    xSemaphoreGive(xSemaphore_P);
                   }
                 }
               }
@@ -162,9 +152,51 @@ void getSealevelHeightNAP(void * parameter) {
         }
       }
     }
-    vTaskDelay(10 * 60000 / portTICK_PERIOD_MS); // wait 10 minutes
+    vTaskDelay(10 * 60000 / portTICK_PERIOD_MS); // wait 10 minutes (update frequency of seawaterlevel)
   }
-  vTaskDelete(NULL);
+}
+
+//checks the level of the column against the wanted level and sets the worlds.
+void determinWorld(void *parameter) {
+  while (true) {
+    if ( xSemaphore_world != NULL && xSemaphore_P != NULL) {
+      if ( xSemaphoreTake( xSemaphore_world, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+        if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+          float p_upper = pressureWanted * 1.025f; //+2.5 % error
+          float p_lower = pressureWanted * 0.975f; //-2.5 % error
+          //pressure is used, release semaphore
+          xSemaphoreGive(xSemaphore_P);
+          if (p_lower > pressureCurrent ) {
+            error = setWorld(W1_LOW);
+          } else if (p_upper < pressureCurrent) {
+            error = setWorld(W2_HIGH);
+          } else {
+            error = setWorld(W3_GOOD);
+          }
+        }
+        xSemaphoreGive(xSemaphore_world);
+      }
+    }
+    vTaskDelay(60000 / portTICK_PERIOD_MS); // wait a minute
+  }
+}
+
+
+void testINETConnection(void * parameter) {
+  while (true) {
+    if ( xSemaphore_INET != NULL ) {
+      if ( xSemaphoreTake( xSemaphore_INET, ( TickType_t ) 100 ) == pdTRUE ) {
+        if (WiFi.status() == WL_CONNECTED) {
+          digitalWrite(WIFI_ON, HIGH);
+          vTaskDelay(120000 / portTICK_PERIOD_MS);
+        } else {
+          digitalWrite(WIFI_ON, LOW);
+          setWorld(START);
+        }
+        xSemaphoreGive( xSemaphore_INET );
+      }
+    }
+  }
 }
 
 void initiateINETConnection(void * parameter) {
@@ -192,6 +224,39 @@ void initiateINETConnection(void * parameter) {
   vTaskDelete(NULL); // done
 }
 
+//task to lower water in column (only task to do solenoid IO)
+void lowerWater(void * parameter) {
+  if ( xSemaphore_P != NULL ) {
+    /* See if we can obtain the semaphore.  If the semaphore is not
+      available wait 30 ticks to see if it becomes free. */
+    if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 30 ) == pdTRUE ) {
+      float minutes_flow = min(1.0f, (pressureCurrent - pressureWanted) / FLOW_OUT);
+      xSemaphoreGive( xSemaphore_P );
+      //change on release
+      digitalWrite(SOLENOID, LOW);
+      vTaskDelay(round(minutes_flow * 1000) / portTICK_PERIOD_MS); // wait a period
+      digitalWrite(SOLENOID, HIGH);
+    }
+  }
+  vTaskDelete(NULL); // done
+}
+
+//task to raise water in column (only task to do pump IO)
+void raiseWater(void * parameter) {
+  if ( xSemaphore_P != NULL ) {
+    /* See if we can obtain the semaphore.  If the semaphore is not
+      available wait 30 ticks to see if it becomes free. */
+    if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 30 ) == pdTRUE ) {
+      float minutes_flow = min(1.0f, (pressureWanted - pressureCurrent) / FLOW_IN);
+      xSemaphoreGive( xSemaphore_P );
+      digitalWrite(PUMP, HIGH);
+      vTaskDelay(round(minutes_flow * 1000) / portTICK_PERIOD_MS); // wait a period
+      digitalWrite(PUMP, LOW);
+    }
+  }
+  vTaskDelete(NULL); // done
+}
+
 void handleWorlds(void * parameter) {
   //handles the world changes and fires the corresponding tasks
   while (true) {
@@ -207,31 +272,22 @@ void handleWorlds(void * parameter) {
             xSemaphoreGive( xSemaphore_INET );
           }
         }
-
         if (world != next_world) {
           switch (next_world) {
             case W1_LOW:
-
+              xTaskCreate(raiseWater,"raise", 1000, NULL, 1, NULL);
               break;
             case W2_HIGH:
-
+              xTaskCreate(lowerWater, "lower", 1000, NULL, 1, NULL);
               break;
             case W3_GOOD:
-
+              //where ok.
               break;
             case W4_ERROR:
 
               break;
             case START:
-              xTaskCreate(
-                initiateINETConnection,
-                "iNet_Connection",
-                1000,
-                NULL,
-                1,
-                NULL            // Task handle
-              );
-
+              xTaskCreate(initiateINETConnection, "iNet_Connection", 1000, NULL, 1, NULL);
               break;
             default:
               xSemaphoreGive( xSemaphore_world );
@@ -239,7 +295,7 @@ void handleWorlds(void * parameter) {
         }
       }
     }
-    vTaskDelay(1000 / portTICK_PERIOD_MS); // wait a second
+    vTaskDelay(120000 / portTICK_PERIOD_MS); // wait 2 minutes
   }
 }
 
@@ -276,33 +332,14 @@ void setup() {
   xSemaphore_P = xSemaphoreCreateMutex();
   xSemaphore_INET = xSemaphoreCreateMutex();
 
-  //handles the state.
-  xTaskCreate(
-    handleWorlds,
-    "Worlds",
-    1000,
-    NULL,
-    1,
-    NULL
-  );
+  //handles the worlds.
+  xTaskCreate( handleWorlds, "Worlds", 1000, NULL, 1, NULL);
   //handels reading of current column height in kg.
-  xTaskCreate(
-    pressureReader,
-    "Pressure",
-    1000,
-    NULL,
-    1,
-    NULL
-  );
+  xTaskCreate(pressureReader, "Pressure", 1000, NULL, 1, NULL);
   //handles reading of waterlevel
-  xTaskCreate(
-    getSealevelHeightNAP,
-    "Level",
-    1000,
-    NULL,
-    1,
-    NULL
-  );
+  xTaskCreate(getSealevelHeightNAP, "Level", 1000, NULL, 1, NULL );
+  //what is the world like today?
+  xTaskCreate(determinWorld, "Worlds", 1000, NULL, 1, NULL);
 }
 
 void loop() {
