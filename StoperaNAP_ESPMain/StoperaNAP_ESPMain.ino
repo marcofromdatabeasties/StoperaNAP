@@ -74,7 +74,7 @@ SemaphoreHandle_t xSemaphore_INET = NULL; //mutex for connection status
 //does http handling
 HTTPClient http;
 
-bool addNewPressureValue(float pressureNew) {
+void addNewPressureValue(float pressureNew) {
   if ( xSemaphore_P != NULL ) {
     /* See if we can obtain the semaphore.  If the semaphore is not
       available wait 30 ticks to see if it becomes free. */
@@ -84,25 +84,18 @@ bool addNewPressureValue(float pressureNew) {
       pressureCurrent = pressureNew;
       xSemaphoreGive( xSemaphore_P );
     }
-    return true;
-
-  } else {
-    return false; //error setup not completed.
   }
 }
 
-bool setWorld(uint8_t world) {
+void setWorld(uint8_t worldNew) {
   if ( xSemaphore_world != NULL ) {
     /* See if we can obtain the semaphore.  If the semaphore is not
       available wait 10 ticks to see if it becomes free. */
     if ( xSemaphoreTake( xSemaphore_world, ( TickType_t ) 30 ) == pdTRUE ) {
-      next_world = world;
+      world = next_world;
+      next_world = worldNew;
       xSemaphoreGive( xSemaphore_world );
     }
-    return true;
-
-  } else {
-    return false; //error setup not completed.
   }
 }
 
@@ -112,12 +105,14 @@ void getSealevelHeightNAP(void * parameter) {
     if ( xSemaphore_INET != NULL ) {
       if ( xSemaphoreTake( xSemaphore_INET, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
         if (WiFi.status() == WL_CONNECTED) {
+          
           http.begin(IJMUIDEN); //URL waterlevel
           int httpCode = http.GET(); //Make the request
+          //no longer needed to hold the inet-connection, we got what we need.
+          xSemaphoreGive( xSemaphore_INET );
+          
           if (httpCode == 200) {
             String payload = http.getString();
-            //no longer needed to hold the inet-connection, we got what we need.
-            xSemaphoreGive( xSemaphore_INET );
             //Datum;Tijd;Parameter;Locatie;Meting;Astronomisch getijden;Eenheid;Windrichting;Windrichting eenheid;Bemonsteringshoogte;Referentievlak;
             CSV_Parser cp(payload.c_str(), /*format*/ "ssssfdsdsss-",  /*has_header*/ true, /*delimiter*/ ';');
             //char **dates = (char**)cp["Datum"];
@@ -167,17 +162,17 @@ void determinWorld(void *parameter) {
           //pressure is used, release semaphore
           xSemaphoreGive(xSemaphore_P);
           if (p_lower > pressureCurrent ) {
-            error = setWorld(W1_LOW);
+            setWorld(W1_LOW);
           } else if (p_upper < pressureCurrent) {
-            error = setWorld(W2_HIGH);
+            setWorld(W2_HIGH);
           } else {
-            error = setWorld(W3_GOOD);
+            setWorld(W3_GOOD);
           }
         }
         xSemaphoreGive(xSemaphore_world);
       }
     }
-    vTaskDelay(60000 / portTICK_PERIOD_MS); // wait a minute
+    vTaskDelay(10 * 60000 / portTICK_PERIOD_MS); // wait a minute
   }
 }
 
@@ -213,12 +208,8 @@ void initiateINETConnection(void * parameter) {
       xSemaphoreGive( xSemaphore_INET );
 
       digitalWrite(WIFI_ON, HIGH);
-      if ( xSemaphore_world != NULL ) {
-        if ( xSemaphoreTake( xSemaphore_world, ( TickType_t ) 100 ) == pdTRUE ) {
-          world = W3_GOOD;
-          xSemaphoreGive( xSemaphore_world );
-        }
-      }
+      setWorld(W3_GOOD);
+      
     }
   }
   vTaskDelete(NULL); // done
@@ -262,16 +253,6 @@ void handleWorlds(void * parameter) {
   while (true) {
     if ( xSemaphore_world != NULL ) {
       if ( xSemaphoreTake( xSemaphore_world, ( TickType_t ) 100 ) == pdTRUE ) {
-        //check the inet connection
-        if ( xSemaphore_INET != NULL ) {
-          if ( xSemaphoreTake( xSemaphore_INET, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
-            //we could be getting the sealevel at this point, so wait a little longer.
-            if (WiFi.status() != WL_CONNECTED) {
-              next_world = START;
-            }
-            xSemaphoreGive( xSemaphore_INET );
-          }
-        }
         if (world != next_world) {
           switch (next_world) {
             case W1_LOW:
@@ -309,7 +290,7 @@ void pressureReader(void* parameter) {
       if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 100 / portTICK_PERIOD_MS ) == pdTRUE ) {
         //read 12bit ADC > max 4095
         float p_now = map_f(float(analogRead(PRESSURE)), 0.0, 4095.0, 0.0, C_P_MAX);
-        bool error = addNewPressureValue(p_now);
+        addNewPressureValue(p_now);
         xSemaphoreGive( xSemaphore_P );
       }
     }
