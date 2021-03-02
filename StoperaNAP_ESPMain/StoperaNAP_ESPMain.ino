@@ -222,11 +222,10 @@ void lowerWater(void * parameter) {
       available wait 30 ticks to see if it becomes free. */
     if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 30 ) == pdTRUE ) {
       float minutes_flow = min(1.0f, (pressureCurrent - pressureWanted) / FLOW_OUT);
-      xSemaphoreGive( xSemaphore_P );
-      //change on release
       digitalWrite(SOLENOID, LOW);
       vTaskDelay(round(minutes_flow * 1000) / portTICK_PERIOD_MS); // wait a period
       digitalWrite(SOLENOID, HIGH);
+      xSemaphoreGive( xSemaphore_P );
     }
   }
   vTaskDelete(NULL); // done
@@ -239,10 +238,10 @@ void raiseWater(void * parameter) {
       available wait 30 ticks to see if it becomes free. */
     if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 30 ) == pdTRUE ) {
       float minutes_flow = min(1.0f, (pressureWanted - pressureCurrent) / FLOW_IN);
-      xSemaphoreGive( xSemaphore_P );
       digitalWrite(PUMP, HIGH);
       vTaskDelay(round(minutes_flow * 1000) / portTICK_PERIOD_MS); // wait a period
       digitalWrite(PUMP, LOW);
+      xSemaphoreGive( xSemaphore_P );
     }
   }
   vTaskDelete(NULL); // done
@@ -287,7 +286,7 @@ float map_f(float x, float in_min, float in_max, float out_min, float out_max) {
 void pressureReader(void* parameter) {
   while (true) {
     if ( xSemaphore_P != NULL) {
-      if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 100 / portTICK_PERIOD_MS ) == pdTRUE ) {
+      if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 60000 / portTICK_PERIOD_MS ) == pdTRUE ) {
         //read 12bit ADC > max 4095
         float p_now = map_f(float(analogRead(PRESSURE)), 0.0, 4095.0, 0.0, C_P_MAX);
         addNewPressureValue(p_now);
