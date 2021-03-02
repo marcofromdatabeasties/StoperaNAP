@@ -289,8 +289,9 @@ void pressureReader(void* parameter) {
       if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 60000 / portTICK_PERIOD_MS ) == pdTRUE ) {
         //read 12bit ADC > max 4095
         float p_now = map_f(float(analogRead(PRESSURE)), 0.0, 4095.0, 0.0, C_P_MAX);
-        addNewPressureValue(p_now);
         xSemaphoreGive( xSemaphore_P );
+        addNewPressureValue(p_now);
+        
       }
     }
     vTaskDelay(30000 / portTICK_PERIOD_MS); // wait 1/2 minute
