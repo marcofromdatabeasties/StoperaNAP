@@ -81,8 +81,6 @@ TaskHandle_t xHandlex_Level;
 TaskHandle_t xHandlex_HandleErrors;
 TaskHandle_t xHandlex_INET;
 
-uint8_t temprature_sens_read();
-
 void addNewPressureValue(float pressureNew) {
   if ( xSemaphore_P != NULL ) {
     /* See if we can obtain the semaphore.  If the semaphore is not
@@ -99,6 +97,7 @@ void addNewPressureValue(float pressureNew) {
 void checkError(void *parameter) {
   static String l; //log
   while (true) {
+    vTaskDelay(1200000 / portTICK_PERIOD_MS); // wait 20 minutes (update frequency of seawaterlevel)
     if ( xSemaphore_P != NULL ) {
       /* See if we can obtain the semaphore.  If the semaphore is not
         available wait 30 ticks to see if it becomes free. */
@@ -109,16 +108,8 @@ void checkError(void *parameter) {
         if (error) {
           setWorld(W4_ERROR);
         }
-        if (temprature_sens_read() > 158) { //no need to check when we are having errors already 158 Fahrenheit = 70 celcius
-          setWorld(W4_ERROR);
-        } else {
-          int8_t temp = (temprature_sens_read() - 32) / 1.8;
-          l = "Temp_" + temp;
-          xTaskCreate(logger, "log1", 2000, &l , 1, NULL);
-        }
       }
     }
-    vTaskDelay(600000 / portTICK_PERIOD_MS); // wait 10 minutes (update frequency of seawaterlevel)
   }
 }
 
@@ -167,6 +158,7 @@ void getSealevelHeightNAP(void * parameter) {
   // gets the sealevel and translates it into pressure of the column.
   static String l; //log
   while (true) {
+    vTaskDelay(600000 / portTICK_PERIOD_MS); // wait 10 minutes (update frequency of seawaterlevel)
     if ( xSemaphore_INET != NULL ) {
       if ( xSemaphoreTake( xSemaphore_INET, ( TickType_t ) 10000 / portTICK_PERIOD_MS ) == pdTRUE ) { //10 second wait
         if (WiFi.status() == WL_CONNECTED) {
@@ -202,7 +194,6 @@ void getSealevelHeightNAP(void * parameter) {
         }
       }
     }
-    vTaskDelay(600000 / portTICK_PERIOD_MS); // wait 10 minutes (update frequency of seawaterlevel)
   }
 }
 
@@ -240,16 +231,18 @@ void determinWorld(void *parameter) {
 
 void testINETConnection(void * parameter) {
   static String l;
+  vTaskDelay(1000 / portTICK_PERIOD_MS); // 1 second
   while (true) {
     if ( xSemaphore_INET != NULL ) {
       if ( xSemaphoreTake( xSemaphore_INET, ( TickType_t ) 100 ) == pdTRUE ) {
         if (WiFi.status() == WL_CONNECTED) {
           digitalWrite(WIFI_ON, HIGH);
-          vTaskDelay(120000 / portTICK_PERIOD_MS); // 2 minutes
+          vTaskDelay(119000 / portTICK_PERIOD_MS); // 2 minutes
         } else {
           digitalWrite(WIFI_ON, LOW);
           setWorld(START);
           vTaskDelay(1000 / portTICK_PERIOD_MS); // 1 second
+          digitalWrite(WIFI_ON, HIGH);
         }
         xSemaphoreGive( xSemaphore_INET );
       }
@@ -273,6 +266,7 @@ void initiateINETConnection(void * parameter) {
       while (WiFi.status() != WL_CONNECTED) {
         vTaskDelay(500 / portTICK_PERIOD_MS);
       }
+      
       xSemaphoreGive( xSemaphore_INET );
 
       setWorld(W3_GOOD);
@@ -419,7 +413,7 @@ void setup() {
   //Errors checking
   xTaskCreate(checkError, "Errors", 3000, NULL, 1,  &xHandlex_HandleErrors);
   //test for net connection
-  xTaskCreate(testINETConnection, 3000, NULL, 1,  &xHandlex_INET);
+  xTaskCreate(testINETConnection,"INETt" , 3000, NULL, 1,  &xHandlex_INET);
 }
 
 void loop() {
