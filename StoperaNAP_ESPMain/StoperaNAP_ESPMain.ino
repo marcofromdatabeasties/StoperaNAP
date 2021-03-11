@@ -16,6 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#https://github.com/espressif/arduino-esp32/blob/master/libraries/WiFi/examples/ETH_LAN8720/ETH_LAN8720.ino
 */
 #include <WiFi.h>
 #include <FirebaseJson.h>
@@ -24,8 +25,7 @@
 //File that includes the secrets
 #include "Keys.h"
 
-#define IJMUIDEN_alt "https://waterberichtgeving.rws.nl/wbviewer/maak_grafiek.php?loc=IJMH&set=metingen&nummer=12&format=csv"
-#define IJMUIDEN "https://waterinfo.rws.nl/api/chart?mapType=waterhoogte&locationCode=IJmuiden-Buitenhaven(IJMH)&values=-1,0"
+#define IJMUIDEN "https://naplevel-tifcbsrqva-ez.a.run.app/api/v1/sdkflj432l324ljkhk234jjl/level/ijmuiden_haven"
 
 #ifndef LOGGING
 #define LOGGING "<<some webhook tooling like ifttt url >>";
@@ -78,6 +78,10 @@ TaskHandle_t xHandlex_World;
 TaskHandle_t xHandlex_Pressure;
 TaskHandle_t xHandlex_HandleWorld;
 TaskHandle_t xHandlex_Level;
+TaskHandle_t xHandlex_HandleErrors;
+TaskHandle_t xHandlex_INET;
+
+uint8_t temprature_sens_read();
 
 void addNewPressureValue(float pressureNew) {
   if ( xSemaphore_P != NULL ) {
@@ -92,16 +96,29 @@ void addNewPressureValue(float pressureNew) {
   }
 }
 
-void checkErrorPressureValues(void *parameter) {
-  if ( xSemaphore_P != NULL ) {
-    /* See if we can obtain the semaphore.  If the semaphore is not
-      available wait 30 ticks to see if it becomes free. */
-    if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 30 ) == pdTRUE ) {
-      bool eror = pressureNminus1 == pressureCurrent &&
-                  pressureNminus2 == pressureNminus1;
-      xSemaphoreGive( xSemaphore_P );
-      setWorld(W4_ERROR);
+void checkError(void *parameter) {
+  static String l; //log
+  while (true) {
+    if ( xSemaphore_P != NULL ) {
+      /* See if we can obtain the semaphore.  If the semaphore is not
+        available wait 30 ticks to see if it becomes free. */
+      if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 30 ) == pdTRUE ) {
+        bool error = pressureNminus1 == pressureCurrent &&
+                     pressureNminus2 == pressureNminus1;
+        xSemaphoreGive( xSemaphore_P );
+        if (error) {
+          setWorld(W4_ERROR);
+        }
+        if (temprature_sens_read() > 158) { //no need to check when we are having errors already 158 Fahrenheit = 70 celcius
+          setWorld(W4_ERROR);
+        } else {
+          int8_t temp = (temprature_sens_read() - 32) / 1.8;
+          l = "Temp_" + temp;
+          xTaskCreate(logger, "log1", 2000, &l , 1, NULL);
+        }
+      }
     }
+    vTaskDelay(600000 / portTICK_PERIOD_MS); // wait 10 minutes (update frequency of seawaterlevel)
   }
 }
 
@@ -156,63 +173,36 @@ void getSealevelHeightNAP(void * parameter) {
           HTTPClient http;
           http.begin(IJMUIDEN); //URL waterlevel
           int httpCode = http.GET(); //Make the request
+          String content = http.getString();
 
           //no longer needed to hold the inet-connection, we got what we need.
           xSemaphoreGive( xSemaphore_INET );
 
-          l = "Received code" + httpCode;
-          xTaskCreate(logger, "log4", 2000, &l , 1, NULL);
-
           if (httpCode == HTTP_CODE_OK) {
-            String content = http.getString();
-           
-            FirebaseJson json;
-            FirebaseJsonData jsonData;
-            json.setJsonData(content);
-            json.get(jsonData, "series/[0]/data");
+            float value = content.toFloat();
 
-            FirebaseJsonArray myArr;
-            //Get the array data
-            jsonData.getArray(myArr);
+            float p = ((value * C_RATIO + C_HEIGHT_NAP) * 3.1415926f * pow(C_R, 2)) / 1000.0f; //h * pi * r² (volume cylinder) 1000cm³ = 1 kg = liter
 
-            String path = "[" + String(myArr.size() - 1) + "]/value";
-            myArr.get(jsonData, path);
-            float value = jsonData.floatValue;
+            l = "pressure_wanted_" + String(p);
+            xTaskCreate(logger, "log4", 3000, &l , 1, NULL);
 
-            if (jsonData.success) {
-              l = "Parse error";
-              xTaskCreate(logger, "log4b", 3000, &l , 1, NULL);
-            } else {
-
-              l = "value" + String(value);
-              xTaskCreate(logger, "log4", 3000, &l , 1, NULL);
-
-
-              //p will be 0.0 when parsing failes atof(str) function used in lib.
-              float p = ((value * C_RATIO + C_HEIGHT_NAP) * 3.1415926f * pow(C_R, 2)) / 1000.0f; //h * pi * r² (volume cylinder) 1000cm³ = 1 kg = liter
-
-              float p_upper = p * 1.025f; //+2.5 % error
-              float p_lower = p * 0.975f; //-2.5 % error
-
-              boolean error = false;
-              if ( xSemaphore_P != NULL) {
-                if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
-                  pressureWanted = min(C_P_MAX, p);
-                  //pressure is set, release semaphore
-                  xSemaphoreGive(xSemaphore_P);
-                }
+            if ( xSemaphore_P != NULL) {
+              if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 10000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+                pressureWanted = min(C_P_MAX, p);
+                //pressure is set, release semaphore
+                xSemaphoreGive(xSemaphore_P);
               }
             }
           }
 
           http.end(); //free resources
         } else {
-          //no longer needed to hold the inet-connection, we got what we need.
+          //no longer needed to hold the inet-connection, we're skipping this one.
           xSemaphoreGive( xSemaphore_INET );
         }
       }
     }
-    vTaskDelay(60000 / portTICK_PERIOD_MS); // wait 10/5 minutes (update frequency of seawaterlevel)
+    vTaskDelay(600000 / portTICK_PERIOD_MS); // wait 10 minutes (update frequency of seawaterlevel)
   }
 }
 
@@ -220,33 +210,32 @@ void getSealevelHeightNAP(void * parameter) {
 void determinWorld(void *parameter) {
   static String l;
   while (true) {
-    if ( xSemaphore_world != NULL && xSemaphore_P != NULL) {
-      if ( xSemaphoreTake( xSemaphore_world, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
-        if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
-          float p_upper = pressureWanted * 1.025f; //+2.5 % error
-          float p_lower = pressureWanted * 0.975f; //-2.5 % error
-          //pressure is used, release semaphore
-          xSemaphoreGive(xSemaphore_P);
-          if (p_lower > pressureCurrent ) {
-            setWorld(W1_LOW);
-            l = "Column to low";
+    if ( xSemaphore_P != NULL) {
+      if ( xSemaphoreTake( xSemaphore_P, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+        float p_upper = pressureWanted * 1.025f; //+2.5 % error
+        float p_lower = pressureWanted * 0.975f; //-2.5 % error
+        //pressure is used, release semaphore
+        xSemaphoreGive(xSemaphore_P);
+        if (p_lower > pressureCurrent ) {
+          setWorld(W1_LOW);
+          l = "Column to low";
 
-          } else if (p_upper < pressureCurrent) {
-            setWorld(W2_HIGH);
-            l = "Column to high";
+        } else if (p_upper < pressureCurrent) {
+          setWorld(W2_HIGH);
+          l = "Column to high";
 
-          } else {
-            setWorld(W3_GOOD);
-            l = "Column ok";
-          }
+        } else {
+          setWorld(W3_GOOD);
+          l = "Column ok";
         }
-        xSemaphoreGive(xSemaphore_world);
-        xTaskCreate(logger, "log3", 3000, &l , 1, NULL);
       }
+      xTaskCreate(logger, "log3", 3000, &l , 1, NULL);
     }
-    vTaskDelay(10 * 60000 / portTICK_PERIOD_MS); // wait 10 minutes
+
+    vTaskDelay(60000 / portTICK_PERIOD_MS); // wait 10 minutes
   }
 }
+
 
 
 void testINETConnection(void * parameter) {
@@ -282,16 +271,11 @@ void initiateINETConnection(void * parameter) {
       vTaskDelay(3000 / portTICK_PERIOD_MS); // wait 5 seconds
 
       while (WiFi.status() != WL_CONNECTED) {
-        Serial.print(".");
         vTaskDelay(500 / portTICK_PERIOD_MS);
       }
-      Serial.print("IP: ");
-      Serial.println(WiFi.localIP());
       xSemaphoreGive( xSemaphore_INET );
 
-      digitalWrite(WIFI_ON, HIGH);
       setWorld(W3_GOOD);
-
     }
   }
   vTaskDelete(NULL); // done
@@ -354,7 +338,12 @@ void handleWorlds(void * parameter) {
               vTaskDelete(xHandlex_Pressure);
               vTaskDelete(xHandlex_HandleWorld);
               vTaskDelete(xHandlex_Level);
+              vTaskDelete(xHandlex_HandleErrors);
+              vTaskDelete(xHandlex_INET);
+              l = "Error state initiated";
+              xTaskCreate(logger, "log2", 2000, &l , 1, NULL);
               WiFi.disconnect();
+              digitalWrite(WIFI_ON, LOW); // INET off
               break;
             case START:
               xTaskCreate(initiateINETConnection, "iNet_Connection", 10000, NULL, 1, NULL);
@@ -427,9 +416,10 @@ void setup() {
   xTaskCreate(getSealevelHeightNAP, "Level", 10000, NULL, 1, &xHandlex_Level);
   //what is the world like today?
   xTaskCreate(determinWorld, "DetWorlds", 3000, NULL, 1, &xHandlex_HandleWorld);
-
-  //needs INET check
-
+  //Errors checking
+  xTaskCreate(checkError, "Errors", 3000, NULL, 1,  &xHandlex_HandleErrors);
+  //test for net connection
+  xTaskCreate(testINETConnection, 3000, NULL, 1,  &xHandlex_INET);
 }
 
 void loop() {
