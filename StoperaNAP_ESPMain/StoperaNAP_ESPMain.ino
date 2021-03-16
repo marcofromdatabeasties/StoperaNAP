@@ -16,16 +16,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#https://github.com/espressif/arduino-esp32/blob/master/libraries/WiFi/examples/ETH_LAN8720/ETH_LAN8720.ino
+  #https://github.com/espressif/arduino-esp32/blob/master/libraries/WiFi/examples/ETH_LAN8720/ETH_LAN8720.ino
 */
 #include <WiFi.h>
-#include <FirebaseJson.h>
 #include <dummy.h>
 #include <HTTPClient.h>
 //File that includes the secrets
 #include "Keys.h"
 
-#define IJMUIDEN "https://naplevel-tifcbsrqva-ez.a.run.app/api/v1/sdkflj432l324ljkhk234jjl/level/ijmuiden_haven"
 
 #ifndef LOGGING
 #define LOGGING "<<some webhook tooling like ifttt url >>";
@@ -266,7 +264,7 @@ void initiateINETConnection(void * parameter) {
       while (WiFi.status() != WL_CONNECTED) {
         vTaskDelay(500 / portTICK_PERIOD_MS);
       }
-      
+
       xSemaphoreGive( xSemaphore_INET );
 
       setWorld(W3_GOOD);
@@ -327,6 +325,9 @@ void handleWorlds(void * parameter) {
               //where ok.
               break;
             case W4_ERROR:
+              l = "Error state initiated";
+              xTaskCreate(logger, "loge", 2000, &l , 1, NULL);
+              digitalWrite(WIFI_ON, LOW); // INET off
               //stops the worlds
               vTaskDelete(xHandlex_World);
               vTaskDelete(xHandlex_Pressure);
@@ -334,8 +335,7 @@ void handleWorlds(void * parameter) {
               vTaskDelete(xHandlex_Level);
               vTaskDelete(xHandlex_HandleErrors);
               vTaskDelete(xHandlex_INET);
-              l = "Error state initiated";
-              xTaskCreate(logger, "log2", 2000, &l , 1, NULL);
+
               WiFi.disconnect();
               digitalWrite(WIFI_ON, LOW); // INET off
               break;
@@ -413,7 +413,7 @@ void setup() {
   //Errors checking
   xTaskCreate(checkError, "Errors", 3000, NULL, 1,  &xHandlex_HandleErrors);
   //test for net connection
-  xTaskCreate(testINETConnection,"INETt" , 3000, NULL, 1,  &xHandlex_INET);
+  xTaskCreate(testINETConnection, "INETt" , 3000, NULL, 1,  &xHandlex_INET);
 }
 
 void loop() {
