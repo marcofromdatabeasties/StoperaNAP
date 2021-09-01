@@ -26,13 +26,44 @@
 #define LOGGING "<<some webhook tooling like ifttt url >>";
 #endif
 
+//defining the modem
+#define SerialAT Serial2
+#define TINY_GSM_MODEM_A6
+
+#if !defined(TINY_GSM_RX_BUFFER)
+#define TINY_GSM_RX_BUFFER 1024
+#endif
+
+#define TINY_GSM_DEBUG Serial
+#define TINY_GSM_USE_GPRS true
+
+const char apn[]      = "internet";
+const char gprsUser[] = "";
+const char gprsPass[] = "";
+#define GSM_PIN "0000"
+
+#include <TinyGsmClient.h>
+
+#define TINY_GSM_USE_GPRS true
+
+#ifdef DUMP_AT_COMMANDS
+#include <StreamDebugger.h>
+StreamDebugger debugger(SerialAT, SerialMon);
+TinyGsm        modem(debugger);
+#else
+TinyGsm        modem(SerialAT);
+#endif
+
+TinyGsmClient  client(modem);
+
+//define ports
 #define PUMP 23 //pomp GPIO23, om water bij te pompen
 #define SOLENOID 22 //solenoid GPIO22, water weg te laten lopen.
 #define WIFI_ON 2 //inet active led indicator, use onboard
 #define PRESSURE 36 // FSR op ADC1_0, meet de hoeveelheid water in kolom.
 #define MAX_PRES 4095 //max conversie waarde: 0-4095 bij 0.1-3.2 volt.
 
-
+//define worlds
 const static uint8_t W1_LOW = 0; // world 1: water in kolom te laag tov NAP/ water in column to low
 const static uint8_t W2_HIGH = 1; // world 2: water in kolom te hoog tov NAP/water in column to high
 const static uint8_t W3_GOOD = 2; // world 3: water in kolom goed tov NAP/water in column ok
@@ -53,6 +84,10 @@ const static uint8_t NOWHERE = 5;//boot
 #define FLOW_OUT 5 //liter per minute.
 // end change on release
 
+#define LEVEL_SERVER naplevel-tifcbsrqva-ez.a.run.app
+#define LEVEL_RESOURCE /api/v1/sdkflj432l324ljkhk234jjl/waterlevel/
+
+
 SemaphoreHandle_t xSemaphore_INET = NULL; //mutex for connection status
 SemaphoreHandle_t xSemaphore_log = NULL; //mutex for logging
 
@@ -71,7 +106,7 @@ float map_f(float x, float in_min, float in_max, float out_min, float out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-struct Column_t {
+class Column_t {
   public:
     Column_t(const char* cde) {
       code = String(*cde);
@@ -139,10 +174,25 @@ void getSealevelHeightNAP(void * clmn) {
     //mind INET is GLOBAL
     if ( xSemaphore_INET != NULL ) {
       if ( xSemaphoreTake( xSemaphore_INET, ( TickType_t ) 10000 / portTICK_PERIOD_MS ) == pdTRUE ) { //10 second wait
-        if (true ) { // this should test connection
-          //change to A6
-          String content = "50";
-
+        if (modem.isGprs ) { // this should test connection
+          if (!client.connect(LEVEL_SERVER, port)) {
+            xTaskCreate(logger, "log4", 3000, "Failed to connect server" , 1, NULL);
+          } else {
+            client.print(String("GET ") +  LEVEL_RESOURCE + column->code + " HTTP/1.1\r\n");
+            client.print(String("Host: ") + server + "\r\n");
+            client.print("Connection: close\r\n\r\n");
+            client.println();
+            uint32_t timeout = millis();
+            while (client.connected() && millis() - timeout < 10000L) {
+              // Print available data
+              //todo
+              ........
+              while (client.available()) {
+                char c = client.read();
+                timeout = millis();
+              }
+            }
+          }
           //no longer needed to hold the inet-connection, we got what we need.
           xSemaphoreGive( xSemaphore_INET );
 
@@ -290,8 +340,7 @@ void pressureReader(void* parameter) {
       if ( xSemaphoreTake( column->xSemaphore_P, ( TickType_t ) 60000 / portTICK_PERIOD_MS ) == pdTRUE ) {
         //read 12bit ADC > max 4095
         float p_now = map_f(float(analogRead(PRESSURE)), 0.0, 4095.0, 0.0, C_P_MAX);
-        String l = "Pressure read" + String(p_now);
-        xTaskCreate(logger, "log1", 2000, &l , 1, NULL);
+        xTaskCreate(logger, "log1", 2000, "Pressure read" + String(p_now), 1, NULL);
         xSemaphoreGive( column->xSemaphore_P );
         column->addNewPressureValue(p_now);
       }
@@ -306,48 +355,20 @@ void testINETConnection(void * parameter) {
   while (true) {
     if ( xSemaphore_INET != NULL ) {
       if ( xSemaphoreTake( xSemaphore_INET, ( TickType_t ) 100 ) == pdTRUE ) {
-        //Hello there?
-        Serial2.println("AT");
-        if (Serial2.findUntil("OK", "\n")) {
-          //Are we connected to GPRS network?
-          Serial2.println("AT+CREG?");
-          String result = Serial2.readString();
-          //n of 0 or 1 accepted
-          result.replace("0,", "1,");
-          //stat 1 or 5 accepted
-          result.replace(",5", ",1");
-          //remove spaces
-          result.replace(" ", "");
-          result.trim();
-          Serial.println(result);
-          if (result == "+CREG:1,1\nOK") {
-            //test for Mobile Termination
-            Serial2.println("AT+CGATT?");
-            if (Serial2.findUntil("+CGATT: 1", "OK\n")) {
-              digitalWrite(WIFI_ON, HIGH);
-              vTaskDelay(119000 / portTICK_PERIOD_MS); // near 2 minutes
-            } else {
-              digitalWrite(WIFI_ON, LOW);
-              ijmh.setWorld(START);
-              ziez.setWorld(START);
-              vTaskDelay(1000 / portTICK_PERIOD_MS); // 1 second
-              digitalWrite(WIFI_ON, HIGH);
-            }
-          }
+        if (modem.isGprsConnected()) {
+          digitalWrite(WIFI_ON, HIGH);
+          vTaskDelay(119000 / portTICK_PERIOD_MS); // near 2 minutes
+        } else {
+          digitalWrite(WIFI_ON, LOW);
+          ijmh.setWorld(START);
+          ziez.setWorld(START);
+          vTaskDelay(1000 / portTICK_PERIOD_MS); // 1 second
+          digitalWrite(WIFI_ON, HIGH);
         }
         xSemaphoreGive( xSemaphore_INET );
       }
-    }
+    }     
   }
-}
-
-boolean modemReplyOk() {
-  if (Serial2.available()) {
-    String reply = Serial2.readString();
-    xTaskCreate(logger, "reply", 3000, &reply , 1, NULL);
-    return reply.endsWith("Ok\n");
-  }
-  return false;
 }
 
 void initiateINETConnection(void * parameter) {
@@ -355,26 +376,18 @@ void initiateINETConnection(void * parameter) {
   if (false) {  // test inet connection
     if ( xSemaphore_INET != NULL ) {
       if ( xSemaphoreTake( xSemaphore_INET, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
-        Serial2.println("AT");
-        if (modemReplyOK()) {
-          Serial2.println("AT+CGATT=1");
-          if (modemReplyOK()) {
-            Serial2.println("AT+CGDCONT=1,\”IP\”,\”APN\”");
-            if (modemReplyOK()) {
-              Serial2.println("AT+CGACT=1,1");
-              if (modemReplyOK()) {
-                Serial2.println("AT+CIFSR");
-                //get ip adress.
-                if (modemReplyOK()) {
-                  ijmh.setWorld(W3_GOOD);
-                  ziez.setWorld(W3_GOOD);
-                }
-              }
-            }
-          }
-        }
-
         // Init modem
+        modem.restart();
+        if (GSM_PIN && modem.getSimStatus() != 3) { 
+          modem.simUnlock(GSM_PIN); 
+        }
+        modem.gprsConnect(apn, gprsUser, gprsPass);
+        if (!modem.waitForNetwork()) {
+          SerialMon.println(" fail");
+        } else {
+          ijmh.setWorld(W3_GOOD);
+          ziez.setWorld(W3_GOOD);
+        }
         xSemaphoreGive( xSemaphore_INET );
       }
     }
@@ -385,9 +398,9 @@ void initiateINETConnection(void * parameter) {
 TaskHandle_t xHandlex_INET;
 
 void setup() {
-  Serial.begin(115200);
-  Serial2.begin(9600);
-  Serial2.setTimeout(200);
+  SerialMon.begin(115200);
+  SerialAT.begin(115200,SERIAL_8N1,16,17,false);
+  modem.setBaud(115200)
 
   pinMode(PUMP, OUTPUT);
   pinMode(SOLENOID, OUTPUT);
@@ -400,7 +413,12 @@ void setup() {
   xSemaphore_INET = xSemaphoreCreateMutex();
   xSemaphore_log = xSemaphoreCreateMutex();
 
-  Serial.println("Starting tasks");
+  String modemInfo = modem.getModemInfo();
+  SerialMon.print("Modem Info: ");
+  SerialMon.println(modemInfo);
+
+
+  SerialMon.println("Starting tasks");
 
   //handles the worlds.
   xTaskCreate(handleWorlds, "IJM_H_Worlds", 10000, &ijmh, 1, ijmh.xHandlex_World);
