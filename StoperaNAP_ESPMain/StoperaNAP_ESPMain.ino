@@ -54,7 +54,6 @@ TinyGsm        modem(debugger);
 TinyGsm        modem(SerialAT);
 #endif
 
-TinyGsmClient  client(modem);
 
 //define ports
 #define PUMP 23 //pomp GPIO23, om water bij te pompen
@@ -87,6 +86,8 @@ const static uint8_t NOWHERE = 5;//boot
 #define LEVEL_SERVER naplevel-tifcbsrqva-ez.a.run.app
 #define LEVEL_RESOURCE /api/v1/sdkflj432l324ljkhk234jjl/waterlevel/
 
+TinyGsmClient  client(modem);
+HttpClient    http(client, LEVEL_SERVER, 80);
 
 SemaphoreHandle_t xSemaphore_INET = NULL; //mutex for connection status
 SemaphoreHandle_t xSemaphore_log = NULL; //mutex for logging
@@ -174,24 +175,19 @@ void getSealevelHeightNAP(void * clmn) {
     //mind INET is GLOBAL
     if ( xSemaphore_INET != NULL ) {
       if ( xSemaphoreTake( xSemaphore_INET, ( TickType_t ) 10000 / portTICK_PERIOD_MS ) == pdTRUE ) { //10 second wait
-        if (modem.isGprs ) { // this should test connection
+        String content;
+        if (modem.isGprsConnected()) { // this should test connection
           if (!client.connect(LEVEL_SERVER, port)) {
             xTaskCreate(logger, "log4", 3000, "Failed to connect server" , 1, NULL);
           } else {
-            client.print(String("GET ") +  LEVEL_RESOURCE + column->code + " HTTP/1.1\r\n");
-            client.print(String("Host: ") + server + "\r\n");
-            client.print("Connection: close\r\n\r\n");
-            client.println();
-            uint32_t timeout = millis();
-            while (client.connected() && millis() - timeout < 10000L) {
-              // Print available data
-              //todo
-              ........
-              while (client.available()) {
-                char c = client.read();
-                timeout = millis();
+            int err = http.get(resource);
+            if (err == 0) {
+              int status = http.responseStatusCode();
+              if (status == 200) {
+                content  = http.responseBody();
               }
             }
+            http.stop();
           }
           //no longer needed to hold the inet-connection, we got what we need.
           xSemaphoreGive( xSemaphore_INET );
