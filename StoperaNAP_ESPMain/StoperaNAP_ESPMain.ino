@@ -1,5 +1,7 @@
 
 
+
+
 /**
    Programma dat aan de hand van de (deels) verwachte waterstanden boven NAP in het Stopera monument de juiste waarde laat zien.
 
@@ -19,23 +21,19 @@
 
 */
 //File that includes the secrets
-//#include "Keys.h"
+#include "keys.h"
+#include <Vector.h>
 
-
-#ifndef LOGGING
-#define LOGGING "<<some webhook tooling like ifttt url >>";
-#endif
+#define VERBOSE true
 
 //defining the modem
 #define SerialAT Serial2
+#define SerialMon Serial
 #define TINY_GSM_MODEM_A6
 
 #if !defined(TINY_GSM_RX_BUFFER)
 #define TINY_GSM_RX_BUFFER 1024
 #endif
-
-#define TINY_GSM_DEBUG Serial
-#define TINY_GSM_USE_GPRS true
 
 const char apn[]      = "internet";
 const char gprsUser[] = "";
@@ -43,7 +41,8 @@ const char gprsPass[] = "";
 #define GSM_PIN "0000"
 
 #include <TinyGsmClient.h>
-
+#include <ArduinoHttpClient.h>
+#define TINY_GSM_DEBUG Serial
 #define TINY_GSM_USE_GPRS true
 
 #ifdef DUMP_AT_COMMANDS
@@ -53,6 +52,7 @@ TinyGsm        modem(debugger);
 #else
 TinyGsm        modem(SerialAT);
 #endif
+
 
 
 //define ports
@@ -83,8 +83,8 @@ const static uint8_t NOWHERE = 5;//boot
 #define FLOW_OUT 5 //liter per minute.
 // end change on release
 
-#define LEVEL_SERVER naplevel-tifcbsrqva-ez.a.run.app
-#define LEVEL_RESOURCE /api/v1/sdkflj432l324ljkhk234jjl/waterlevel/
+const String LEVEL_SERVER = "naplevel-tifcbsrqva-ez.a.run.app";
+const String LEVEL_RESOURCE = "/api/v1/"+KEY+"/waterlevel/";
 
 TinyGsmClient  client(modem);
 HttpClient    http(client, LEVEL_SERVER, 80);
@@ -92,15 +92,23 @@ HttpClient    http(client, LEVEL_SERVER, 80);
 SemaphoreHandle_t xSemaphore_INET = NULL; //mutex for connection status
 SemaphoreHandle_t xSemaphore_log = NULL; //mutex for logging
 
+String loggingList[5];
+Vector<String> loggingQueue(loggingList);
+
 //does the logging
-void logger(void * what) {
-  if ( xSemaphore_log != NULL) {
-    if ( xSemaphoreTake( xSemaphore_log, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
-      Serial.println(*((String*)what));
-      xSemaphoreGive( xSemaphore_log );
+void logger(void *notused) {
+  if (VERBOSE) {
+    if ( xSemaphore_log != NULL) {
+      if ( xSemaphoreTake( xSemaphore_log, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+        if (loggingQueue.size()> 1) {
+          Serial.println(loggingQueue[0]);
+          loggingQueue.remove(0);
+        }
+        xSemaphoreGive( xSemaphore_log );
+      }
     }
+    vTaskDelete(NULL); // done
   }
-  vTaskDelete(NULL); // done
 }
 
 float map_f(float x, float in_min, float in_max, float out_min, float out_max) {
@@ -177,10 +185,11 @@ void getSealevelHeightNAP(void * clmn) {
       if ( xSemaphoreTake( xSemaphore_INET, ( TickType_t ) 10000 / portTICK_PERIOD_MS ) == pdTRUE ) { //10 second wait
         String content;
         if (modem.isGprsConnected()) { // this should test connection
-          if (!client.connect(LEVEL_SERVER, port)) {
-            xTaskCreate(logger, "log4", 3000, "Failed to connect server" , 1, NULL);
+          if (!client.connect(LEVEL_SERVER.c_str(), 80)) {
+            loggingQueue.push_back("Failed to connect server");
+            xTaskCreate(logger, "log4", 3000, NULL , 1, NULL);
           } else {
-            int err = http.get(resource);
+            int err = http.get(LEVEL_RESOURCE.c_str());
             if (err == 0) {
               int status = http.responseStatusCode();
               if (status == 200) {
@@ -197,8 +206,8 @@ void getSealevelHeightNAP(void * clmn) {
 
             float pressure = ((value * C_RATIO + C_HEIGHT_NAP) * 3.1415926f * pow(C_R, 2)) / 1000.0f; //h * pi * r² (volume cylinder) 1000cm³ = 1 kg = liter
 
-            String l = "pressure wanted" + String(pressure);
-            xTaskCreate(logger, "log4", 3000, &l , 1, NULL);
+            loggingQueue.push_back("pressure" + String(pressure));  //TODO round
+            xTaskCreate(logger, "log4", 3000, NULL, 1, NULL);
 
             if ( column->xSemaphore_P != NULL) {
               if ( xSemaphoreTake( column->xSemaphore_P, ( TickType_t ) 10000 / portTICK_PERIOD_MS ) == pdTRUE ) {
@@ -220,7 +229,6 @@ void getSealevelHeightNAP(void * clmn) {
 //checks the level of the column against the wanted level and sets the worlds.
 void determinWorld(void *parameter ) {
   Column_t *column = static_cast<Column_t *>(parameter);
-  static String l;
   while (true) {
     if ( column->xSemaphore_P != NULL) {
       if ( xSemaphoreTake( column->xSemaphore_P, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
@@ -230,18 +238,18 @@ void determinWorld(void *parameter ) {
         xSemaphoreGive(column->xSemaphore_P);
         if (p_lower > column->pressureCurrent ) {
           column->setWorld(W1_LOW);
-          l = "Column to low";
+          loggingQueue.push_back("Column to low");
 
         } else if (p_upper < column->pressureCurrent) {
           column->setWorld(W2_HIGH);
-          l = "Column to high";
+          loggingQueue.push_back("Column to high");
 
         } else {
           column->setWorld(W3_GOOD);
-          l = "Column ok";
+          loggingQueue.push_back("Column ok");
         }
       }
-      xTaskCreate(logger, "log3", 3000, &l , 1, NULL);
+      xTaskCreate(logger, "log3", 3000, NULL , 1, NULL);
     }
 
     vTaskDelay(60000 / portTICK_PERIOD_MS); // wait 10 minutes
@@ -285,13 +293,12 @@ void raiseWater(void * parameter) {
 void handleWorlds(void * parameter) {
   //handles the world changes and fires the corresponding tasks
   Column_t *column = static_cast<Column_t *>(parameter);
-  static String l; //logging
   while (true) {
     if ( column->xSemaphore_world != NULL ) {
       if ( xSemaphoreTake( column->xSemaphore_world, ( TickType_t ) 100 ) == pdTRUE ) {
         if (column->world != column->next_world) {
-          l = "World has changed to " + String(column->next_world) + " from " + String(column->world);
-          xTaskCreate(logger, "log2", 2000, &l , 1, NULL);
+          loggingQueue.push_back("World has changed to " + String(column->next_world) + " from " + String(column->world));
+          xTaskCreate(logger, "log2", 2000, NULL , 1, NULL);
           switch (column->next_world) {
             case W1_LOW:
               xTaskCreate(raiseWater, "raise", 1000, column, 1, NULL);
@@ -303,8 +310,8 @@ void handleWorlds(void * parameter) {
               //where ok.
               break;
             case W4_ERROR:
-              l = "Error state initiated";
-              xTaskCreate(logger, "logger", 2000, &l , 1, NULL);
+              loggingQueue.push_back("Error state initiated");
+              xTaskCreate(logger, "logger", 2000, NULL , 1, NULL);
               digitalWrite(WIFI_ON, LOW); // INET off
               //stops the worlds
               vTaskDelete(column->xHandlex_World);
@@ -336,7 +343,8 @@ void pressureReader(void* parameter) {
       if ( xSemaphoreTake( column->xSemaphore_P, ( TickType_t ) 60000 / portTICK_PERIOD_MS ) == pdTRUE ) {
         //read 12bit ADC > max 4095
         float p_now = map_f(float(analogRead(PRESSURE)), 0.0, 4095.0, 0.0, C_P_MAX);
-        xTaskCreate(logger, "log1", 2000, "Pressure read" + String(p_now), 1, NULL);
+        loggingQueue.push_back("Pressure read" + String(p_now));
+        xTaskCreate(logger, "log1", 2000, NULL, 1, NULL);
         xSemaphoreGive( column->xSemaphore_P );
         column->addNewPressureValue(p_now);
       }
@@ -396,7 +404,7 @@ TaskHandle_t xHandlex_INET;
 void setup() {
   SerialMon.begin(115200);
   SerialAT.begin(115200,SERIAL_8N1,16,17,false);
-  modem.setBaud(115200)
+  modem.setBaud(115200);
 
   pinMode(PUMP, OUTPUT);
   pinMode(SOLENOID, OUTPUT);
