@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Oct 20 13:25:34 2021
+
+@author: ubuntu
+
+Main class that symbolizes the monument, containing three cylinders two of which 
+display the current water level at IJmuiden en Zierikzee and one displaying the
+level of the 1953 flood.
+"""
+import threading
+from water import WaterColumn
+import time
+import RPi.GPIO as GPIO
+
+class NAPMonument:
+    
+    IJmuiden = WaterColumn("IJMH", 0, 17, 27) #12 is in use by MCP3208
+    Zierikzee = WaterColumn("ZIEZ", 1, 23, 24)
+    #Watersnood= WaterColumn("WNRAA", 2, 20, 21)
+   
+    def __init__(self):
+        GPIO.setup(17, GPIO.OUT)
+        GPIO.setup(27, GPIO.OUT)
+        GPIO.setup(23, GPIO.OUT)
+        GPIO.setup(24, GPIO.OUT)
+        GPIO.setup(20, GPIO.OUT)
+        GPIO.setup(21, GPIO.OUT)
+        
+        ijmuidenthread = threading.Thread(target=self.IJmuiden.startWorlds, args=(), daemon=True)
+        zierikzeethread = threading.Thread(target=self.Zierikzee.startWorlds, args=(), daemon=True)
+        ijmuidenthread.start()
+        zierikzeethread.start()
+       
+    def start(self):
+       while True:
+           time.sleep(60)
+
+    

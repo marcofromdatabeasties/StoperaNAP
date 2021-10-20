@@ -186,7 +186,10 @@ void getSealevelHeightNAP(void * clmn) {
         String content;
         if (modem.isGprsConnected()) { // this should test connection
           if (!client.connect(LEVEL_SERVER.c_str(), 80)) {
-            loggingQueue.push_back("Failed to connect server");
+            if ( xSemaphoreTake( xSemaphore_log, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+              loggingQueue.push_back("Failed to connect server");
+              xSemaphoreGive( xSemaphore_log );
+            }
             xTaskCreate(logger, "log4", 3000, NULL , 1, NULL);
           } else {
             int err = http.get(LEVEL_RESOURCE.c_str());
@@ -205,8 +208,10 @@ void getSealevelHeightNAP(void * clmn) {
             float value = content.toFloat();
 
             float pressure = ((value * C_RATIO + C_HEIGHT_NAP) * 3.1415926f * pow(C_R, 2)) / 1000.0f; //h * pi * r² (volume cylinder) 1000cm³ = 1 kg = liter
-
-            loggingQueue.push_back("pressure" + String(pressure));  //TODO round
+            if ( xSemaphoreTake( xSemaphore_log, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+              loggingQueue.push_back("pressure" + String(pressure));  //TODO round
+              xSemaphoreGive( xSemaphore_log );
+            }
             xTaskCreate(logger, "log4", 3000, NULL, 1, NULL);
 
             if ( column->xSemaphore_P != NULL) {
@@ -238,15 +243,22 @@ void determinWorld(void *parameter ) {
         xSemaphoreGive(column->xSemaphore_P);
         if (p_lower > column->pressureCurrent ) {
           column->setWorld(W1_LOW);
-          loggingQueue.push_back("Column to low");
-
+          if ( xSemaphoreTake( xSemaphore_log, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+            loggingQueue.push_back("Column to low");
+            xSemaphoreGive( xSemaphore_log );
+          }
         } else if (p_upper < column->pressureCurrent) {
           column->setWorld(W2_HIGH);
-          loggingQueue.push_back("Column to high");
-
+          if ( xSemaphoreTake( xSemaphore_log, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+            loggingQueue.push_back("Column to high");
+            xSemaphoreGive( xSemaphore_log );
+          }
         } else {
           column->setWorld(W3_GOOD);
-          loggingQueue.push_back("Column ok");
+          if ( xSemaphoreTake( xSemaphore_log, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+            loggingQueue.push_back("Column ok");
+            xSemaphoreGive( xSemaphore_log );
+          }
         }
       }
       xTaskCreate(logger, "log3", 3000, NULL , 1, NULL);
@@ -297,7 +309,10 @@ void handleWorlds(void * parameter) {
     if ( column->xSemaphore_world != NULL ) {
       if ( xSemaphoreTake( column->xSemaphore_world, ( TickType_t ) 100 ) == pdTRUE ) {
         if (column->world != column->next_world) {
-          loggingQueue.push_back("World has changed to " + String(column->next_world) + " from " + String(column->world));
+          if ( xSemaphoreTake( xSemaphore_log, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+            loggingQueue.push_back("World has changed to " + String(column->next_world) + " from " + String(column->world));
+            xSemaphoreGive( xSemaphore_log );
+          }
           xTaskCreate(logger, "log2", 2000, NULL , 1, NULL);
           switch (column->next_world) {
             case W1_LOW:
@@ -310,7 +325,10 @@ void handleWorlds(void * parameter) {
               //where ok.
               break;
             case W4_ERROR:
-              loggingQueue.push_back("Error state initiated");
+              if ( xSemaphoreTake( xSemaphore_log, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+                loggingQueue.push_back("Error state initiated");
+                xSemaphoreGive( xSemaphore_log );
+              }
               xTaskCreate(logger, "logger", 2000, NULL , 1, NULL);
               digitalWrite(WIFI_ON, LOW); // INET off
               //stops the worlds
@@ -343,7 +361,10 @@ void pressureReader(void* parameter) {
       if ( xSemaphoreTake( column->xSemaphore_P, ( TickType_t ) 60000 / portTICK_PERIOD_MS ) == pdTRUE ) {
         //read 12bit ADC > max 4095
         float p_now = map_f(float(analogRead(PRESSURE)), 0.0, 4095.0, 0.0, C_P_MAX);
-        loggingQueue.push_back("Pressure read" + String(p_now));
+        if ( xSemaphoreTake( xSemaphore_log, ( TickType_t ) 1000 / portTICK_PERIOD_MS ) == pdTRUE ) {
+          loggingQueue.push_back("Pressure read" + String(p_now));
+          xSemaphoreGive( xSemaphore_log );
+        }
         xTaskCreate(logger, "log1", 2000, NULL, 1, NULL);
         xSemaphoreGive( column->xSemaphore_P );
         column->addNewPressureValue(p_now);
