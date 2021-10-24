@@ -21,6 +21,7 @@ import RPi.GPIO as GPIO
 
 class State:
     def handleState(level_column, level_desired):
+        
         level_desired_min = level_desired * 0.95
         level_desired_max = level_desired * 1.05
         if (level_column > level_desired_min and level_column < level_desired_max):
@@ -40,14 +41,19 @@ class NoWhere(State):
             return self
         else:
             logging.info("Connected, with the IP address: %s", IPaddress )
-            return  Start()     
+            return  Start()
+    def getName(self):
+        return "N"
 
 class Good(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump):
         logging.info("%s = Level good ", location)
         GPIO.output(pin_valve, GPIO.LOW)
         GPIO.output(pin_pump, GPIO.LOW)
-        return self.handleState(level_column, level_desired)    
+        return self.handleState(level_column, level_desired) 
+   
+    def getName(self):
+        return "G"
     
 
 class High(State):
@@ -56,6 +62,9 @@ class High(State):
         GPIO.output(pin_valve, GPIO.HIGH)
         GPIO.output(pin_pump, GPIO.LOW)
         return self.handleState(level_column, level_desired)
+    
+    def getName(self):
+        return "H"
         
 class Low(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump):
@@ -64,9 +73,23 @@ class Low(State):
         GPIO.output(pin_pump, GPIO.HIGH)
         return self.handleState(level_column, level_desired)
 
+    def getName(self):
+        return "L"
+    
 class Start(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump):
         logging.info("Starting %s", location)
         return self.handleState(level_column, level_desired) 
+    
+    def getName(self):
+        return "S"
                 
-        
+class Error(State):
+    def execute(self, location, level_column, level_desired, pin_valve, pin_pump):
+        logging.info("%s = Error", location)
+        GPIO.output(pin_valve, GPIO.LOW)
+        GPIO.output(pin_pump, GPIO.LOW)
+        return self
+   
+    def getName(self):
+        return "E"        

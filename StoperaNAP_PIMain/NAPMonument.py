@@ -14,12 +14,13 @@ from water import WaterColumn
 import time
 import RPi.GPIO as GPIO
 from screen import LCD
+import constants
 
 class NAPMonument:
     
-    IJmuiden = WaterColumn("IJMH", 0, 17, 27) #12 is in use by MCP3208
-    Zierikzee = WaterColumn("ZIEZ", 1, 23, 24)
-    #Watersnood= WaterColumn("WNRAA", 2, 20, 21)
+    IJmuiden = WaterColumn(constants.COLUMN_1_LOCATION, 0, 17, 27) #12 is in use by MCP3208
+    Zierikzee = WaterColumn(constants.COLUMN_2_LOCATION, 1, 23, 24)
+    #Watersnood = WaterColumn1953("1953", 2, 20, 21)
     
     screen = LCD()
    

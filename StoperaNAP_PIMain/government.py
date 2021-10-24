@@ -9,42 +9,57 @@ Created on Wed Oct 20 16:19:43 2021
 import urllib
 import zipfile
 from io import BytesIO
-
+from datetime import timedelta
+from datetime import datetime
+import constants
 
 class RWS:
+    starttime=datetime.now() - timedelta(minutes=11) #bootstrap sentinel
+    minutes_10 = timedelta(minutes=10)
+    result = []
+    
     def getWaterLevel(self, measure_location):
-        try:
-            mask = bytearray(b'     ')
-            if (len(measure_location) <= 5 and len(measure_location) >= 2 and measure_location.isupper()):
-                byteCode = bytearray(measure_location.strip().encode('utf-8'))
+        
+        if (self.starttime + self.minutes_10 >= datetime.now()):
+    
+            try:
+                mask = bytearray(b'     ')
+                if (len(measure_location) <= 5 and len(measure_location) >= 2 and measure_location.isupper()):
+                    byteCode = bytearray(measure_location.strip().encode('utf-8'))
+                    
+                    for idx, b in enumerate(bytearray(byteCode)):
+                        mask[idx] = b
+                else:
+                    return 0, False
                 
-                for idx, b in enumerate(bytearray(byteCode)):
-                    mask[idx] = b
-            else:
-                return -1
-            
-            if mask in self.validCodes():
-                req = urllib.request.Request("https://www.rijkswaterstaat.nl/rws/opendata/meetdata/meetdata.zip")
-                with urllib.request.urlopen(req) as response:
-                   zipFromURL = response.read()
-                   zippie = zipfile.ZipFile(BytesIO(zipFromURL))
-                   dat = zippie.read('update.dat')
-                   adm = zippie.read('update.adm')
-                   
-                   data = dat.splitlines()
-                
-                   for idx, line in enumerate(adm.splitlines()):
+                if mask in self.validCodes():
+                    req = urllib.request.Request(constants.RWS_URL)
+                    with urllib.request.urlopen(req) as response:
+                       zipFromURL = response.read()
+                       zippie = zipfile.ZipFile(BytesIO(zipFromURL))
+                       dat = zippie.read('update.dat')
+                       adm = zippie.read('update.adm')
                        
-                       if line[15:18] == b'H10' and line[4:9] == mask:
-                          #print (data[idx][:len(data[idx])-1])
-                          measures = str(data[idx][:len(data[idx])-1],'utf-8').split(",")
-                          #print (measures, flush=True)
-                          return (measures[len(measures)-1].strip())
-            else:
-                return -1
-            
-        except:
-            return -1
+                       data = dat.splitlines()
+                    
+                       for idx, line in enumerate(adm.splitlines()):
+                           
+                           if line[15:18] == b'H10' and line[4:9] == mask:
+                              #print (data[idx][:len(data[idx])-1])
+                              measures = str(data[idx][:len(data[idx])-1],'utf-8').split(",")
+                              #print (measures, flush=True)
+                              #level of NAP 
+                              value = float(measures[len(measures)-1].strip())
+                              self.result[measure_location] = value
+                              self.starttime = datetime.now()
+                              return value, True
+                else:
+                    return 0, False
+                
+            except:
+                return 0, False
+        else:
+            return self.result[measure_location], True
         
     def validCodes(): 
     	return [	b'AMRO ',
