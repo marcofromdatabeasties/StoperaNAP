@@ -13,12 +13,15 @@ import threading
 from water import WaterColumn
 import time
 import RPi.GPIO as GPIO
+from screen import LCD
 
 class NAPMonument:
     
     IJmuiden = WaterColumn("IJMH", 0, 17, 27) #12 is in use by MCP3208
     Zierikzee = WaterColumn("ZIEZ", 1, 23, 24)
     #Watersnood= WaterColumn("WNRAA", 2, 20, 21)
+    
+    screen = LCD()
    
     def __init__(self):
         GPIO.setup(17, GPIO.OUT)
@@ -28,8 +31,8 @@ class NAPMonument:
         GPIO.setup(20, GPIO.OUT)
         GPIO.setup(21, GPIO.OUT)
         
-        ijmuidenthread = threading.Thread(target=self.IJmuiden.startWorlds, args=(), daemon=True)
-        zierikzeethread = threading.Thread(target=self.Zierikzee.startWorlds, args=(), daemon=True)
+        ijmuidenthread = threading.Thread(target=self.IJmuiden.runWorlds, args=(self.screen), daemon=True)
+        zierikzeethread = threading.Thread(target=self.Zierikzee.runWorlds, args=(self.screen), daemon=True)
         ijmuidenthread.start()
         zierikzeethread.start()
        

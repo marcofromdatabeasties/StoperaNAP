@@ -21,13 +21,16 @@ import RPi.GPIO as GPIO
 
 class State:
     def handleState(level_column, level_desired):
-        if (level_column > level_desired):
-            return High()
+        level_desired_min = level_desired * 0.95
+        level_desired_max = level_desired * 1.05
+        if (level_column > level_desired_min and level_column < level_desired_max):
+            return Good()
         else:
-            if (level_column == level_desired):
-                return Good()
+            if (level_column < level_desired_min):
+                return Low()
             else:
-                return Low()        
+                if (level_column > level_desired_max):
+                    return High()
 
 class NoWhere(State):
     def execute(self):
