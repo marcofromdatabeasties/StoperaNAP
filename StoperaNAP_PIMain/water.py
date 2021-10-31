@@ -81,7 +81,7 @@ class WaterColumn1953(WaterColumn):
                 level_desired = 4.55 #https://www.rijkswaterstaat.nl/water/waterbeheer/bescherming-tegen-het-water/watersnoodramp-1953
             else:
                 level_desired = 0
-            if (self.starttime + self.quater >= datetime.now()):
+            if (self.starttime + self.quater < datetime.now()):
                 self.highorlow = not self.highorlow
                 self.starttime = datetime.now()
                 
