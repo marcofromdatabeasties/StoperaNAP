@@ -17,11 +17,7 @@ import RPi.GPIO as GPIO
 class RWS:
     starttime=datetime.now() - timedelta(minutes=11) #bootstrap sentinel
     minutes_10 = timedelta(minutes=10)
-    result = {}
-    
-    def __init__(self):
-        GPIO.setup(5, GPIO.IN) #, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.setup(6, GPIO.IN) #, pull_up_down=GPIO.PUD_DOWN)
+    result = {}        
     
     def getWaterLevel(self, measure_location):
         #test button on

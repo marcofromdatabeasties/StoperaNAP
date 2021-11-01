@@ -32,6 +32,9 @@ class NAPMonument:
         GPIO.setup(21, GPIO.OUT)
         GPIO.setup(12, GPIO.OUT)
         
+        GPIO.setup(5, GPIO.IN) 
+        GPIO.setup(6, GPIO.IN) 
+        
         self.screen = LCD()
         
         self.IJmuiden = WaterColumn(constants.COLUMN_1_LOCATION, 0, 17, 27) #12 is in use by MCP3208
