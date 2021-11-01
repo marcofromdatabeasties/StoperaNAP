@@ -25,6 +25,9 @@ class NAPMonument:
     screen = LCD()
    
     def __init__(self):
+        GPIO.cleanup()
+        GPIO.setmode(GPIO.BCM) 
+        GPIO.setwarnings(True)
         GPIO.setup(17, GPIO.OUT)
         GPIO.setup(27, GPIO.OUT)
         GPIO.setup(23, GPIO.OUT)

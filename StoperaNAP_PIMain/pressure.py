@@ -18,8 +18,7 @@ class Pressure:
         spi = spidev.SpiDev()
         spi.open(0,0)
         spi.max_speed_hz=1000000
-        CS_ADC = 12
-        GPIO.setup(CS_ADC, GPIO.OUT)
+        GPIO.setup(12, GPIO.OUT)
         
         #same thing but for the 12-bit MCP3208
         def readChannel3208(channel):
