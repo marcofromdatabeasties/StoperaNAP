@@ -30,6 +30,7 @@ class NAPMonument:
         GPIO.setup(24, GPIO.OUT)
         GPIO.setup(20, GPIO.OUT)
         GPIO.setup(21, GPIO.OUT)
+        GPIO.setup(12, GPIO.OUT)
         
         self.screen = LCD()
         

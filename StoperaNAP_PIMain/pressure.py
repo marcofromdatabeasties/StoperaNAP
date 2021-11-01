@@ -18,7 +18,7 @@ class Pressure:
         spi = spidev.SpiDev()
         spi.open(0,0)
         spi.max_speed_hz=1000000
-        GPIO.setup(12, GPIO.OUT)
+        
         
         #same thing but for the 12-bit MCP3208
         def readChannel3208(channel):
@@ -30,9 +30,9 @@ class Pressure:
     def getWaterLevel(self, channel):
         self.lock.acquire(True, 10)
         
-        GPIO.output(self.CS_ADC, GPIO.LOW)
+        GPIO.output(12, GPIO.LOW)
         value = self.ReadChannel3208(channel)
-        GPIO.output(self.CS_ADC, GPIO.HIGH)
+        GPIO.output(12, GPIO.HIGH)
         
         self.lock.release()
         return 10 * ((value - 744) / 4095) #4mA minimal current of pressure sensor (gets 0.6v = 744).
