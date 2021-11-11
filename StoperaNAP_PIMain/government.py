@@ -13,6 +13,7 @@ from datetime import timedelta
 from datetime import datetime
 import constants
 import RPi.GPIO as GPIO
+import logging
 
 class RWS:
     starttime=datetime.now() - timedelta(minutes=11) #bootstrap sentinel
@@ -60,6 +61,7 @@ class RWS:
                                       value = float(measures[len(measures)-1].strip())
                                       self.result[measure_location] = value
                                       self.starttime = datetime.now()
+                                      logging.info("NAP {location} = {value} ".format(location = measure_location, value=value))
                                       return value, True
                         else:
                             return 2, False

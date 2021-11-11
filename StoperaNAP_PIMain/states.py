@@ -35,8 +35,8 @@ class State:
 
 class NoWhere(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
-        IPaddress=socket.gethostbyname(socket.gethostname())
-        if IPaddress=="127.0.0.1":
+        IPaddress = self.get_ip()
+        if IPaddress =="127.0.0.1":
             logging.info("No internet ")
             screen.writeInfoToScreen("No IP connection")
             return self
@@ -46,6 +46,18 @@ class NoWhere(State):
             return  Start()
     def getName(self):
         return "N"
+    
+    def get_ip(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            # doesn't even have to be reachable
+            s.connect(('10.255.255.255', 1))
+            IP = s.getsockname()[0]
+        except Exception:
+            IP = '127.0.0.1'
+        finally:
+            s.close()
+        return IP
 
 class Good(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
