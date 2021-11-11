@@ -36,7 +36,7 @@ class State:
 class NoWhere(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
         IPaddress = self.get_ip()
-        if IPaddress =="127.0.0.1":
+        if IPaddress == "127.0.0.1":
             logging.info("No internet ")
             screen.writeInfoToScreen("No IP connection")
             return self
