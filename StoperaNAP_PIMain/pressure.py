@@ -15,16 +15,16 @@ class Pressure:
     
     def __init__(self):
         self.lock = threading.Lock()
-        spi = spidev.SpiDev()
-        spi.open(0,0)
-        spi.max_speed_hz=1000000
+        self.spi = spidev.SpiDev()
+        self.open(0,0)
+        self.max_speed_hz=1000000
         
         
-        #same thing but for the 12-bit MCP3208
-        def readChannel3208(channel):
-            adc = spi.xfer2([6|(channel>>2),channel<<6,0]) #0000011x,xx000000,00000000
-            data = ((adc[1]&15) << 8) + adc[2]
-            return data
+    #same thing but for the 12-bit MCP3208
+    def readChannel3208(self, channel):
+        adc = self.spi.xfer2([6|(channel>>2),channel<<6,0]) #0000011x,xx000000,00000000
+        data = ((adc[1]&15) << 8) + adc[2]
+        return data
     
     
     def getWaterLevel(self, channel):
