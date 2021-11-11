@@ -31,7 +31,7 @@ class Pressure:
         self.lock.acquire(True, 10)
         
         GPIO.output(12, GPIO.LOW)
-        value = self.ReadChannel3208(channel)
+        value = self.readChannel3208(channel)
         GPIO.output(12, GPIO.HIGH)
         
         self.lock.release()
