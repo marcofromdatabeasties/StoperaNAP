@@ -36,6 +36,6 @@ class LCD:
         
     def writeInfoToScreen(self, message):
         self.lock.acquire(True, 10)
-        self.lcd.cursor_pos = (4, 0)
+        self.lcd.cursor_pos = (3, 0)
         self.lcd.write_string(("{message}"+ (' ' * 20)).format(message = message[:20])[:20])
         self.lock.release()
