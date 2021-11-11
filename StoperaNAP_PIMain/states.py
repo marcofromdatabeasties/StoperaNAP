@@ -42,7 +42,7 @@ class NoWhere(State):
             return self
         else:
             logging.info("Connected, with the IP address: %s", IPaddress )
-            screen.writeInfoToScreen("IP: {IPaddress}", format( IPaddress = IPaddress))
+            screen.writeInfoToScreen("IP: {IPaddress}".format( IPaddress = IPaddress))
             return  Start()
     def getName(self):
         return "N"
