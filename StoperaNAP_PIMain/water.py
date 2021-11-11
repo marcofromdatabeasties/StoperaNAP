@@ -51,16 +51,16 @@ class WaterColumn:
             self.state = self.state.execute(self.measure_location, level_column, level_desired,  self.pin_valve, self.pin_pump, screen)
             
             #check if an hardware error is occuring
-            if (self.previous_level == self.level_column and level_desired > level_column):
+            if (self.previous_level == level_column and level_desired > level_column):
                 self.counter += 1
                 if (self.counter > constants.TEN_S_EQUAL_ERROR_COUNT): #1 minute no change in water level, something is wrong -> Error
                     self.state = states.Error()
                     
             else:
                 self.counter = 0
-                self.previous_level = self.level_column
+                self.previous_level = level_column
             
-            screen.writeToScreen(self.channel, self.measure_location, self.state.getName(), self.level_column , self.level_desired)
+            screen.writeToScreen(self.channel, self.measure_location, self.state.getName(), level_column , level_desired)
             time.sleep(constants.COLUMN_WAIT) 
             
             
