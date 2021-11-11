@@ -37,8 +37,7 @@ class WaterColumn:
         self.measure_location = location
         self.pin_pump = pin_pump
         self.pin_valve=pin_valve
-        self.pressureSensor.setChannel(self.channel)
-    
+            
     def runWorlds(self, screen):
         while True:
             #NAP start  + NAP level equals column height 

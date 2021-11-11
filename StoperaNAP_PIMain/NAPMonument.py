@@ -32,8 +32,9 @@ class NAPMonument:
         GPIO.setup(21, GPIO.OUT)
         GPIO.setup(12, GPIO.OUT)
         
-        GPIO.setup(5, GPIO.IN) 
-        GPIO.setup(6, GPIO.IN) 
+        GPIO.setup(5, GPIO.IN) # Test
+        GPIO.setup(6, GPIO.IN) # Empty
+        GPIO.setup(16, GPIO.IN) # Power
         
         self.screen = LCD()
         
