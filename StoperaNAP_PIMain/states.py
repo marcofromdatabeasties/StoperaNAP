@@ -20,7 +20,7 @@ import logging
 import RPi.GPIO as GPIO
 
 class State:
-    def handleState(level_column, level_desired):
+    def handleState(self, level_column, level_desired):
         
         level_desired_min = level_desired * 0.95
         level_desired_max = level_desired * 1.05
