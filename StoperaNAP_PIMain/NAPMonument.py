@@ -42,8 +42,8 @@ class NAPMonument:
         self.Zierikzee = WaterColumn(constants.COLUMN_2_LOCATION, 1, 23, 24)
         #self.Watersnood = WaterColumn1953("1953", 2, 20, 21)
 
-        ijmuidenthread = threading.Thread(target=self.IJmuiden.runWorlds, args=(self.screen), daemon=True)
-        zierikzeethread = threading.Thread(target=self.Zierikzee.runWorlds, args=(self.screen), daemon=True)
+        ijmuidenthread = threading.Thread(target=self.IJmuiden.runWorlds, args=(self.screen,), daemon=True)
+        zierikzeethread = threading.Thread(target=self.Zierikzee.runWorlds, args=(self.screen,), daemon=True)
         ijmuidenthread.start()
         zierikzeethread.start()
        
