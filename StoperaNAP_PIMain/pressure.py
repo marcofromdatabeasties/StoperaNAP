@@ -16,8 +16,8 @@ class Pressure:
     def __init__(self):
         self.lock = threading.Lock()
         self.spi = spidev.SpiDev()
-        self.open(0,0)
-        self.max_speed_hz=1000000
+        self.spi.open(0,0)
+        self.spi.max_speed_hz=1000000
         
         
     #same thing but for the 12-bit MCP3208
