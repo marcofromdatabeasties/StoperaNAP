@@ -48,7 +48,7 @@ class WaterColumn:
             else:
                 level_desired = self.previous_desired
                 
-            self.state = self.state.execute(self.measure_location, level_column, level_desired,  self.pin_valve, self.pin_pump)
+            self.state = self.state.execute(self.measure_location, level_column, level_desired,  self.pin_valve, self.pin_pump, screen)
             
             #check if an hardware error is occuring
             if (self.previous_level == self.level_column and level_desired > level_column):
