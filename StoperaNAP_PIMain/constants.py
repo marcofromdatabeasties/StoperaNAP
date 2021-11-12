@@ -13,4 +13,4 @@ COLUMN_WAIT = 10
 CYCLE_TIME_1953=15
 RWS_URL="https://www.rijkswaterstaat.nl/rws/opendata/meetdata/meetdata.zip"
 COLUMN_1_LOCATION="IJMH"
-COLUMN_2_LOCATION="ZIEZ"
+COLUMN_2_LOCATION="RPBU"

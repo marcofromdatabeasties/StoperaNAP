@@ -17,9 +17,7 @@ from screen import LCD
 import constants
 
 class NAPMonument:
-    
-    
-   
+     
     def __init__(self):
         GPIO.cleanup()
         GPIO.setmode(GPIO.BCM) 
@@ -39,13 +37,13 @@ class NAPMonument:
         self.screen = LCD()
         
         self.IJmuiden = WaterColumn(constants.COLUMN_1_LOCATION, 0, 17, 27) #12 is in use by MCP3208
-        self.Zierikzee = WaterColumn(constants.COLUMN_2_LOCATION, 1, 23, 24)
+        self.Vlissingen = WaterColumn(constants.COLUMN_2_LOCATION, 1, 23, 24)
         #self.Watersnood = WaterColumn1953("1953", 2, 20, 21)
 
         ijmuidenthread = threading.Thread(target=self.IJmuiden.runWorlds, args=(self.screen,), daemon=True)
-        zierikzeethread = threading.Thread(target=self.Zierikzee.runWorlds, args=(self.screen,), daemon=True)
+        vlissingenthread = threading.Thread(target=self.Vlissingen.runWorlds, args=(self.screen,), daemon=True)
         ijmuidenthread.start()
-        zierikzeethread.start()
+        vlissingenthread.start()
        
     def start(self):
        while True:
