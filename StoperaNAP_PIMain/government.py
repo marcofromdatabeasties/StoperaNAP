@@ -18,22 +18,23 @@ import logging
 class RWS:
     starttime=datetime.now() - timedelta(minutes=11) #bootstrap sentinel
     minutes_10 = timedelta(minutes=10)
-    result = {}        
+    result = {}
+    buttons_active = constants.BUTTONS_ACTIVE
     
     def getWaterLevel(self, measure_location):
         #test button on
-        if GPIO.input(5):
+        if self.buttons_active and GPIO.input(5):
             return 0, True
         else:
             #Empty button on
-            if (GPIO.input(6)):
+            if (self.buttons_active and GPIO.input(6)):
                 return -1 * constants.NAP_COLUMN_LEVEL, True
             else:
-                if (self.starttime + self.minutes_10 < datetime.now()):
+                if ((self.starttime + self.minutes_10 < datetime.now()) or (not measure_location in self.result)):
             
                     try:
                         mask = bytearray(b'     ')
-                        if (len(measure_location) <= 5 and len(measure_location) >= 2 and measure_location.isupper()):
+                        if len(measure_location) <= 5 and len(measure_location) >= 2 and measure_location.isupper():
                             byteCode = bytearray(measure_location.strip().encode('utf-8'))
                             
                             for idx, b in enumerate(bytearray(byteCode)):
@@ -58,7 +59,7 @@ class RWS:
                                       measures = str(data[idx][:len(data[idx])-1],'utf-8').split(",")
                                       #print (measures, flush=True)
                                       #level of NAP 
-                                      value = float(measures[len(measures)-1].strip())
+                                      value = float(measures[len(measures)-1].strip()) / 100.0
                                       self.result[measure_location] = value
                                       self.starttime = datetime.now()
                                       logging.info("NAP {location} = {value} ".format(location = measure_location, value=value))
@@ -236,11 +237,9 @@ class RWS:
     ]
     
 if __name__ == "__main__":
-    GPIO.cleanup()
-    GPIO.setmode(GPIO.BCM) 
-    GPIO.setwarnings(True)
     
 
     rws = RWS()
     print (rws.getWaterLevel(constants.COLUMN_1_LOCATION))
-    print (rws.getWaterLevel(constants.COLUMN_1_LOCATION))
+    print (rws.getWaterLevel(constants.COLUMN_2_LOCATION))
+    #print (rws.getWaterLevel(constants.COLUMN_1_LOCATION))
