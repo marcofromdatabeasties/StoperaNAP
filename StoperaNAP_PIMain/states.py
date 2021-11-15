@@ -24,13 +24,17 @@ class State:
         
         level_desired_min = level_desired * 0.95
         level_desired_max = level_desired * 1.05
-        if (level_column > level_desired_min and level_column < level_desired_max):
+        
+        level_column_min = level_column * 0.95
+        level_column_max = level_column * 1.05
+        
+        if (level_column / level_desired >= 0.95 and level_column / level_desired <= 1.05):
             return Good()
         else:
-            if (level_column < level_desired_min):
+            if (level_column_min < level_desired_min):
                 return Low()
             else:
-                if (level_column > level_desired_max):
+                if (level_column_max > level_desired_max):
                     return High()
 
 class NoWhere(State):
@@ -107,3 +111,12 @@ class Error(State):
    
     def getName(self):
         return "E"        
+    
+if __name__ == "__main__":
+    state = State()
+    print (state.handleState(-1.01, -1.00))
+    print (state.handleState(3.00, 1.05))
+    print (state.handleState(1.00, 3.00))
+    
+    nowhere = NoWhere()
+    print (nowhere.get_ip())

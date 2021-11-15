@@ -53,7 +53,7 @@ class WaterColumn:
             #check if an hardware error is occuring
             if (self.previous_level == level_column and level_desired > level_column):
                 self.counter += 1
-                if (self.counter > constants.TEN_S_EQUAL_ERROR_COUNT): #1 minute no change in water level, something is wrong -> Error
+                if (self.counter > constants.TEN_S_EQUAL_ERROR_COUNT): #no change in water level after x iterations, something is wrong -> Error
                     self.state = states.Error()
                     
             else:

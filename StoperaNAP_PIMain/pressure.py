@@ -9,7 +9,7 @@ Created on Wed Oct 20 16:37:42 2021
 import threading
 import spidev
 import RPi.GPIO as GPIO
-
+import constants
 
 class Pressure:
     
@@ -36,4 +36,4 @@ class Pressure:
         GPIO.output(12, GPIO.HIGH)
         
         self.lock.release()
-        return 10 * ((value - 744) / 4095) #4mA minimal current of pressure sensor (gets 0.6v = 744).
+        return constants.NAP_COLUMN_HEIGHT * ((value - 744) / 4095) #4mA minimal current of pressure sensor (gets 0.6v = 744).
