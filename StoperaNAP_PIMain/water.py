@@ -67,7 +67,7 @@ class WaterColumn:
 class WaterColumn1953(WaterColumn):
     
     starttime=datetime.now()
-    quater = timedelta(minutes=constants.CYCLE_TIME_1953)
+    cycletime = timedelta(minutes=constants.CYCLE_TIME_1953)
     highorlow = False
     
     def __init__(self, location, channel, pin_valve, pin_pump ):
@@ -80,7 +80,7 @@ class WaterColumn1953(WaterColumn):
                 level_desired = 4.55 #https://www.rijkswaterstaat.nl/water/waterbeheer/bescherming-tegen-het-water/watersnoodramp-1953
             else:
                 level_desired = constants.NAP_COLUMN_LEVEL
-            if (self.starttime + self.quater < datetime.now()):
+            if (self.starttime + self.cycletime < datetime.now()):
                 self.highorlow = not self.highorlow
                 self.starttime = datetime.now()
                 

@@ -59,7 +59,7 @@ class RWS:
                                       measures = str(data[idx][:len(data[idx])-1],'utf-8').split(",")
                                       #print (measures, flush=True)
                                       #level of NAP 
-                                      value = float(measures[len(measures)-1].strip()) / 100.0
+                                      value = max( float(measures[len(measures)-1].strip()) / 100.0, constants.NAP_COLUMN_MAX_LEVEL)
                                       self.result[measure_location] = value
                                       self.starttime = datetime.now()
                                       logging.info("NAP {location} = {value} ".format(location = measure_location, value=value))
