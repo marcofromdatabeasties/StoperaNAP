@@ -28,7 +28,7 @@ class Pressure:
         return data
     
     
-    def getWaterLevel(self, channel):
+    def getColumnLevel(self, channel):
         self.lock.acquire(True, 10)
         
         GPIO.output(12, GPIO.LOW)

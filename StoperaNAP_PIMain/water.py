@@ -41,7 +41,7 @@ class WaterColumn:
     def runWorlds(self, screen):
         while True:
             #NAP start  + NAP level equals column height 
-            level_column = constants.NAP_COLUMN_LEVEL + self.pressureSensor.getWaterLevel(self.channel)                
+            level_column = constants.NAP_COLUMN_LEVEL + self.pressureSensor.getColumnLevel(self.channel)                
             level_desired, error = self.rws.getWaterLevel(self.measure_location)
             if (not error):
                 self.previous_desired = level_desired
@@ -75,11 +75,11 @@ class WaterColumn1953(WaterColumn):
         
     def runWorlds(self, screen):
         while True:
-            level_column = self.pressureSensor.getWaterLevel(self.channel)
+            level_column = constants.NAP_COLUMN_LEVEL + self.pressureSensor.getColumnLevel(self.channel)
             if (self.highorlow):
                 level_desired = 4.55 #https://www.rijkswaterstaat.nl/water/waterbeheer/bescherming-tegen-het-water/watersnoodramp-1953
             else:
-                level_desired = 0
+                level_desired = constants.NAP_COLUMN_LEVEL
             if (self.starttime + self.quater < datetime.now()):
                 self.highorlow = not self.highorlow
                 self.starttime = datetime.now()
