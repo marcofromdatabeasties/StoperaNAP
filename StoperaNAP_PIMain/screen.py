@@ -27,10 +27,11 @@ class LCD:
 
     def writeToScreen(self, channel, location, status, current_level , desired_level):
         self.lock.acquire(True, 10)
-        print ("desired: {d: 4.2f}".format(d=desired_level))
-        text = "{location} {status} {current_level: 4.2f}/{desired_level: 4.2f}" + (' ' * 20).format(
+        
+        text = ("{location} {status} {current_level: 4.2f}/{desired_level: 4.2f}" + (' ' * 20)).format(
                 location = location, status = status, 
                 current_level=round(current_level, 2) , desired_level = round(desired_level, 2))[:20]
+        print(text)
         self.lcd.cursor_pos = (channel, 0)
         self.lcd.write_string(text)
         self.lock.release()
