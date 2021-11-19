@@ -6,7 +6,7 @@ Created on Wed Oct 20 16:19:43 2021
 @author: ubuntu
 """
 
-import urllib
+import urllib3
 import zipfile
 from io import BytesIO
 from datetime import timedelta
@@ -44,8 +44,8 @@ class RWS:
                             return 1, False
                         
                         if mask in self.validCodes():
-                            req = urllib.request.Request(constants.RWS_URL)
-                            with urllib.request.urlopen(req) as response:
+                            req = urllib3.request.Request(constants.RWS_URL)
+                            with urllib3.request.urlopen(req) as response:
                                zipFromURL = response.read()
                                zippie = zipfile.ZipFile(BytesIO(zipFromURL))
                                dat = zippie.read('update.dat')
