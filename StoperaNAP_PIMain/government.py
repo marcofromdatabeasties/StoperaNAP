@@ -243,4 +243,4 @@ if __name__ == "__main__":
     rws = RWS()
     print (rws.getWaterLevel(constants.COLUMN_1_LOCATION))
     print (rws.getWaterLevel(constants.COLUMN_2_LOCATION))
-    #print (rws.getWaterLevel(constants.COLUMN_1_LOCATION))
+    print (rws.getWaterLevel(constants.COLUMN_1_LOCATION))
