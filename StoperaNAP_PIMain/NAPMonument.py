@@ -34,6 +34,8 @@ class NAPMonument:
         GPIO.setup(6, GPIO.IN) # Empty
         GPIO.setup(16, GPIO.IN) # Power
         
+       
+    def start(self):
         self.screen = LCD()
         
         self.IJmuiden = WaterColumn(constants.COLUMN_1_LOCATION, 0, 17, 27) #12 is in use by MCP3208
@@ -44,9 +46,8 @@ class NAPMonument:
         vlissingenthread = threading.Thread(target=self.Vlissingen.runWorlds, args=(self.screen,), daemon=True)
         ijmuidenthread.start()
         vlissingenthread.start()
-       
-    def start(self):
-       while True:
+
+        while True:
            time.sleep(60)
 
     
