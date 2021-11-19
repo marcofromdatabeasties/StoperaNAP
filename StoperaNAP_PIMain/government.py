@@ -14,6 +14,7 @@ from datetime import datetime
 import constants
 import RPi.GPIO as GPIO
 import logging
+import traceback
 
 class RWS:
     starttime=datetime.now() - timedelta(minutes=11) #bootstrap sentinel
@@ -28,7 +29,7 @@ class RWS:
         else:
             #Empty button on
             if (self.buttons_active and GPIO.input(6)):
-                return -1 * constants.NAP_COLUMN_LEVEL, True
+                return constants.NAP_COLUMN_LEVEL, True
             else:
                 if ((self.starttime + self.minutes_10 < datetime.now()) or (not measure_location in self.result)):
             
@@ -69,6 +70,7 @@ class RWS:
                             return 2, False
                         
                     except:
+                        print(traceback.format_exc())
                         return 3, False
                 else:
                     return self.result[measure_location], True
