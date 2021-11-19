@@ -18,7 +18,6 @@ class Pressure:
         self.spi = spidev.SpiDev()
         self.spi.open(0,0)
         self.spi.max_speed_hz=1000000
-        GPIO.output(12, GPIO.HIGH)
         
         
     #same thing but for the 12-bit MCP3208
