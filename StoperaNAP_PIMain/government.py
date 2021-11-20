@@ -64,7 +64,7 @@ class RWS:
                                       
                                       self.result[measure_location] = value
                                       self.starttime = datetime.now()
-                                      logging.info("NAP {location} = {value} ".format(location = measure_location, value=value))
+                                      print("NAP {location} = {value} ".format(location = measure_location, value=value))
                                       return value, True
                         else:
                             return 2, False
