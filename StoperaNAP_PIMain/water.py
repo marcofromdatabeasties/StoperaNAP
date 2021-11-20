@@ -42,15 +42,16 @@ class WaterColumn:
         while True:
             #NAP start  + NAP level equals column height 
             level_column = constants.NAP_COLUMN_LEVEL + self.pressureSensor.getColumnLevel(self.channel)                
-            level_desired, error = self.rws.getWaterLevel(self.measure_location)
-            if (not error):
+            level_desired, ok = self.rws.getWaterLevel(self.measure_location)
+            
+            if (ok):
                 self.previous_desired = level_desired
             else:
                 print("error")
                 
                 level_desired = self.previous_desired
             
-            if (not error):
+            if (ok):
                 self.state = self.state.execute(self.measure_location, level_column, level_desired,  self.pin_valve, self.pin_pump, screen)
             else:
                 self.state = states.Error()
