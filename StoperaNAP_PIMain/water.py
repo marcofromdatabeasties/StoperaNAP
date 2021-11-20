@@ -46,6 +46,8 @@ class WaterColumn:
             if (not error):
                 self.previous_desired = level_desired
             else:
+                print("error")
+                
                 level_desired = self.previous_desired
             
             if (not error):

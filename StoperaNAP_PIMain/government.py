@@ -13,7 +13,6 @@ from datetime import timedelta
 from datetime import datetime
 import constants
 import RPi.GPIO as GPIO
-import logging
 import traceback
 
 class RWS:
