@@ -18,15 +18,16 @@ NOWHERE = 5;//boot
 import socket
 import logging
 import RPi.GPIO as GPIO
+import constants
 
 class State:
     def handleState(self, level_column, level_desired):
         
-        level_desired_min = level_desired - abs(level_desired * 0.05)
-        level_desired_max = level_desired + abs(level_desired * 0.05)
+        level_desired_min = level_desired - abs(level_desired * constants.ACCURACY_OF_COLUMN)
+        level_desired_max = level_desired + abs(level_desired * constants.ACCURACY_OF_COLUMN)
         
-        level_column_min = level_column - abs(level_column * 0.05)
-        level_column_max = level_column + abs(level_column * 0.05)
+        level_column_min = level_column - abs(level_column * constants.ACCURACY_OF_COLUMN)
+        level_column_max = level_column + abs(level_column * constants.ACCURACY_OF_COLUMN)
 
         
         if (level_column_min <= level_desired <= level_column_max ):

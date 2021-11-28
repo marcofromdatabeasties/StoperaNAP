@@ -17,3 +17,4 @@ RWS_URL="https://www.rijkswaterstaat.nl/rws/opendata/meetdata/meetdata.zip"
 COLUMN_1_LOCATION="IJMH"
 COLUMN_2_LOCATION="RPBU"
 BUTTONS_ACTIVE=False
+ACCURACY_OF_COLUMN=0.05
