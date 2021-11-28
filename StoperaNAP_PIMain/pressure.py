@@ -35,4 +35,4 @@ class Pressure:
         GPIO.output(12, GPIO.HIGH)
         
         self.lock.release()
-        return constants.NAP_COLUMN_HEIGHT * ((value - 744) / 4095) #4mA minimal current of pressure sensor (gets 0.6v = 744).
+        return constants.NAP_COLUMN_HEIGHT * ((value - 744) / 4096) #4mA minimal current of pressure sensor (gets 0.6v = 744).

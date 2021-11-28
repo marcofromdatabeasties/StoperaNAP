@@ -22,13 +22,14 @@ import RPi.GPIO as GPIO
 class State:
     def handleState(self, level_column, level_desired):
         
-        level_desired_min = level_desired * 0.95
-        level_desired_max = level_desired * 1.05
+        level_desired_min = level_desired - abs(level_desired * 0.05)
+        level_desired_max = level_desired + abs(level_desired * 0.05)
         
-        level_column_min = level_column * 0.95
-        level_column_max = level_column * 1.05
+        level_column_min = level_column - abs(level_column * 0.05)
+        level_column_max = level_column + abs(level_column * 0.05)
+
         
-        if (level_column / level_desired >= 0.95 and level_column / level_desired <= 1.05):
+        if (level_column_min <= level_desired <= level_column_max ):
             return Good()
         else:
             if (level_column_min < level_desired_min):
