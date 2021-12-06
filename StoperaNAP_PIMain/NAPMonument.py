@@ -15,6 +15,7 @@ import time
 import RPi.GPIO as GPIO
 from screen import LCD
 import constants
+import os
 
 class NAPMonument:
      
@@ -33,8 +34,11 @@ class NAPMonument:
         GPIO.setup(5, GPIO.IN) # Test
         GPIO.setup(6, GPIO.IN) # Empty
         GPIO.setup(16, GPIO.IN) # Power
+        GPIO.setup(13, GPIO.IN) #reboot
         
         GPIO.output(12, GPIO.HIGH)
+        GPIO.add_event_detect(13, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=2000)
+        GPIO.add_event_detect(16, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=1000)
         
        
     def start(self):
@@ -52,4 +56,7 @@ class NAPMonument:
         while True:
            time.sleep(60)
 
+    def shutdown_h_now():
+        time.sleep(5)
+        os.system("sudo shutdown -h now")
     
