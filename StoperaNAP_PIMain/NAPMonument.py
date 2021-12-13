@@ -39,10 +39,12 @@ class NAPMonument:
         GPIO.output(12, GPIO.HIGH)
         GPIO.add_event_detect(13, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=2000)
         GPIO.add_event_detect(16, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=1000)
+        self.screen = LCD()
+        
         
        
     def start(self):
-        self.screen = LCD()
+        
         
         self.IJmuiden = WaterColumn(constants.COLUMN_1_LOCATION, 0, 17, 27) #12 is in use by MCP3208
         self.Vlissingen = WaterColumn(constants.COLUMN_2_LOCATION, 1, 23, 24)
@@ -57,6 +59,7 @@ class NAPMonument:
            time.sleep(60)
 
     def shutdown_h_now(self, channel):
+        self.screen.writeInfoToScreen("Shutdown...")
         time.sleep(5)
         os.system("sudo shutdown -h now")
     
