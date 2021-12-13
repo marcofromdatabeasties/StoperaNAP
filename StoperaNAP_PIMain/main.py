@@ -11,8 +11,9 @@ from NAPMonument import NAPMonument
 
 def main():
     logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.INFO, datefmt="%H:%M:%S")
-    monument = NAPMonument()
+    logging.setLevel(logging.ERROR)
     
+    monument = NAPMonument()
     monument.start()
     
 

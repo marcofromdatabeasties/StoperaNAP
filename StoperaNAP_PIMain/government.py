@@ -63,13 +63,13 @@ class RWS:
                                       
                                       self.result[measure_location] = value
                                       self.starttime = datetime.now()
-                                      print("NAP {location} = {value} ".format(location = measure_location, value=value))
+                                      #print("NAP {location} = {value} ".format(location = measure_location, value=value))
                                       return value, True
                         else:
                             return 2, False
                         
                     except:
-                        print(traceback.format_exc())
+                        #print(traceback.format_exc())
                         return 3, False
                 else:
                     return self.result[measure_location], True
