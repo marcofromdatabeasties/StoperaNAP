@@ -56,7 +56,7 @@ class NAPMonument:
         while True:
            time.sleep(60)
 
-    def shutdown_h_now():
+    def shutdown_h_now(self, channel):
         time.sleep(5)
         os.system("sudo shutdown -h now")
     
