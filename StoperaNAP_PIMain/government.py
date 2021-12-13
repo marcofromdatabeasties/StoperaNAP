@@ -14,6 +14,7 @@ from datetime import datetime
 import constants
 import RPi.GPIO as GPIO
 import traceback
+import logging
 
 class RWS:
     starttime=datetime.now() - timedelta(minutes=11) #bootstrap sentinel
@@ -69,7 +70,7 @@ class RWS:
                             return 2, False
                         
                     except:
-                        #print(traceback.format_exc())
+                        logging.error(traceback.format_exc())
                         return 3, False
                 else:
                     return self.result[measure_location], True

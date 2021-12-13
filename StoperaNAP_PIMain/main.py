@@ -10,8 +10,7 @@ import logging
 from NAPMonument import NAPMonument
 
 def main():
-    logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.INFO, datefmt="%H:%M:%S")
-    logging.setLevel(logging.ERROR)
+    logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.ERROR, datefmt="%H:%M:%S")
     
     monument = NAPMonument()
     monument.start()
