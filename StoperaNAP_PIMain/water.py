@@ -47,7 +47,7 @@ class WaterColumn:
             if (ok):
                 self.previous_desired = level_desired
             else:
-                print("error")
+                #print("error")
                 
                 level_desired = self.previous_desired
             
@@ -65,7 +65,7 @@ class WaterColumn:
             else:
                 self.counter = 0
                 self.previous_level = level_column
-            print ("Level Desired Column {0:2.2f}".format(level_desired))
+            #print ("Level Desired Column {0:2.2f}".format(level_desired))
             screen.writeToScreen(self.channel, self.measure_location, self.state.getName(), level_column , level_desired)
             time.sleep(constants.COLUMN_WAIT) 
             
