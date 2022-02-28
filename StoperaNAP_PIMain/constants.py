@@ -15,5 +15,5 @@ CYCLE_TIME_1953=15
 RWS_URL="https://www.rijkswaterstaat.nl/rws/opendata/meetdata/meetdata.zip"
 COLUMN_1_LOCATION="IJMH"
 COLUMN_2_LOCATION="RPBU"
-BUTTONS_ACTIVE=False
+BUTTONS_ACTIVE=True
 ACCURACY_OF_COLUMN=0.05

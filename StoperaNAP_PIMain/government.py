@@ -24,11 +24,11 @@ class RWS:
     
     def getWaterLevel(self, measure_location):
         #test button on
-        if self.buttons_active and GPIO.input(5):
+        if self.buttons_active and (not GPIO.input(5)):
             return 0, True
         else:
             #Empty button on
-            if (self.buttons_active and GPIO.input(6)):
+            if (self.buttons_active and (not GPIO.input(6))):
                 return constants.NAP_COLUMN_LEVEL, True
             else:
                 if ((self.starttime + self.minutes_10 < datetime.now()) or (not measure_location in self.result)):
