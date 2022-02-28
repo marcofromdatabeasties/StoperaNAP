@@ -95,7 +95,8 @@ class Low(State):
 
     def getName(self):
         return "L"
-    
+
+
 class Start(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
         logging.info("Starting %s", location)

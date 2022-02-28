@@ -59,7 +59,9 @@ class NAPMonument:
            time.sleep(60)
 
     def shutdown_h_now(self, channel):
-        self.screen.writeInfoToScreen("Shutdown...")
-        time.sleep(5)
-        os.system("sudo shutdown -h now")
+        time.sleep(0.05)
+        if (not GPIO.input(channel)) and (channel == 13 or channel == 16): 
+            self.screen.writeInfoToScreen("Shutdown...")
+            time.sleep(5)
+            os.system("sudo shutdown -h now")
     
