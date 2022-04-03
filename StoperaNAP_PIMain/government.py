@@ -22,13 +22,20 @@ class RWS:
     result = {}
     buttons_active = constants.BUTTONS_ACTIVE
     
+    def isEmptying(self, hour, day):
+        #monday is 0
+        return (self.buttons_active and (not GPIO.input(6))) or ( not  7 <= hour <= 22) or (day in {5, 6} and constants.NO_WEEKEND)
+    
+    
     def getWaterLevel(self, measure_location):
         #test button on
         if self.buttons_active and (not GPIO.input(5)):
             return 0, True
         else:
             #Empty button on
-            if (self.buttons_active and (not GPIO.input(6))):
+            currenttime = datetime.now().time();
+            day = datetime.today().weekday()
+            if (self.isEmptying(currenttime.hour, day)): 
                 return constants.NAP_COLUMN_LEVEL, True
             else:
                 if ((self.starttime + self.minutes_10 < datetime.now()) or (not measure_location in self.result)):
@@ -241,8 +248,16 @@ class RWS:
     
 if __name__ == "__main__":
     
-
+    #GPIO.setmode(GPIO.BCM)
+    
     rws = RWS()
-    print (rws.getWaterLevel(constants.COLUMN_1_LOCATION))
-    print (rws.getWaterLevel(constants.COLUMN_2_LOCATION))
-    print (rws.getWaterLevel(constants.COLUMN_1_LOCATION))
+    rws.buttons_active = False
+    #print (rws.getWaterLevel(constants.COLUMN_1_LOCATION))
+    #print (rws.getWaterLevel(constants.COLUMN_2_LOCATION))
+    #print (rws.getWaterLevel(constants.COLUMN_1_LOCATION))
+    
+    print ( rws.isEmptying(24, 0))
+    print ( rws.isEmptying(22, 0))
+    print ( rws.isEmptying(22, 5))
+    print ( rws.isEmptying(22, 6))
+    print ( rws.isEmptying(8, 0))

@@ -36,7 +36,7 @@ class WaterColumn:
         self.channel = channel
         self.measure_location = location
         self.pin_pump = pin_pump
-        self.pin_valve=pin_valve
+        self.pin_valve = pin_valve
             
     def runWorlds(self, screen):
         while True:
