@@ -20,7 +20,6 @@ import os
 class NAPMonument:
      
     def __init__(self):
-        GPIO.cleanup()
         GPIO.setmode(GPIO.BCM) 
         GPIO.setwarnings(True)
         GPIO.setup(17, GPIO.OUT)
@@ -38,14 +37,14 @@ class NAPMonument:
         
         GPIO.output(12, GPIO.HIGH)
         GPIO.add_event_detect(13, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=2000)
-        GPIO.add_event_detect(16, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=1000)
+        GPIO.add_event_detect(16, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=2000)
+        
+        GPIO.add_event_detect(5, GPIO.BOTH, callback=self.setNAPToZeroOrNot, bouncetime=2000)
+        GPIO.add_event_detect(6, GPIO.BOTH, callback=self.setNAPToEmptyOrNot, bouncetime=2000)
+        
         self.screen = LCD()
-        
-        
        
     def start(self):
-        
-        
         self.IJmuiden = WaterColumn(constants.COLUMN_1_LOCATION, 0, 17, 27) #12 is in use by MCP3208
         self.Vlissingen = WaterColumn(constants.COLUMN_2_LOCATION, 1, 23, 24)
         #self.Watersnood = WaterColumn1953("1953", 2, 20, 21)
@@ -64,4 +63,20 @@ class NAPMonument:
             self.screen.writeInfoToScreen("Shutdown...")
             time.sleep(5)
             os.system("sudo shutdown -h now")
+            
+    def setNAPToZeroOrNot(self, channel):
+        self.Vlissingen.setToNormal() #erase previous state
+        if (not GPIO.input(channel)):
+            self.IJmuiden.setLevelToZero()
+            self.Vlissingen.setLevelToZero()
+        else:
+            self.Vlissingen.setToNormal()
+            
+    def setNAPToEmptyOrNot(self, channel):
+        self.Vlissingen.setToNormal() #erase previous state
+        if (not GPIO.input(channel)):
+            self.IJmuiden.setLevelToEmpty()
+            self.Vlissingen.setLevelToEmpty()
+        else:
+            self.Vlissingen.setToNormal()
     

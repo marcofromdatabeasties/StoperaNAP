@@ -16,7 +16,7 @@ from pressure import Pressure
 from datetime import timedelta
 from datetime import datetime
 import constants
-
+import asyncio
 
 class WaterColumn:
     state = states.NoWhere()
@@ -37,12 +37,39 @@ class WaterColumn:
         self.measure_location = location
         self.pin_pump = pin_pump
         self.pin_valve = pin_valve
+        self.zero = False
+        self.empty = False
+        self.lock = asyncio.Lock()
+        
+    def getWaterLevel(self):
+        async with self.lock: 
+            if (self.zero):
+                return 0, True
+            if (self.empty):
+                return constants.NAP_COLUMN_LEVEL, True
+            return self.rws.getWaterLevel(self.measure_location)
+    
+    def setLevelToZero(self):
+        async with self.lock:
+            #only set when empty is false
+            self.zero = not self.empty
+    
+    def setLevelToEmpty(self):
+        async with self.lock:
+            #only set when zero  is false
+            self.empty = not self.zero
+        
+    def setToNormal(self):
+        async with self.lock:
+            self.zero = False
+            self.empty = False
             
     def runWorlds(self, screen):
         while True:
             #NAP start  + NAP level equals column height 
-            level_column = constants.NAP_COLUMN_LEVEL + self.pressureSensor.getColumnLevel(self.channel)                
-            level_desired, ok = self.rws.getWaterLevel(self.measure_location)
+            level_column = constants.NAP_COLUMN_LEVEL + self.pressureSensor.getColumnLevel(self.channel)
+                
+            level_desired, ok = self.getWaterLevel() 
             
             if (ok):
                 self.previous_desired = level_desired

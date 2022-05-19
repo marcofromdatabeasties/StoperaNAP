@@ -12,7 +12,6 @@ from io import BytesIO
 from datetime import timedelta
 from datetime import datetime
 import constants
-import RPi.GPIO as GPIO
 import traceback
 import logging
 
@@ -20,68 +19,66 @@ class RWS:
     starttime=datetime.now() - timedelta(minutes=11) #bootstrap sentinel
     minutes_10 = timedelta(minutes=10)
     result = {}
-    buttons_active = constants.BUTTONS_ACTIVE
+    
+    #Note checken of GPIO werkt.
     
     def isEmptying(self, hour, day):
         #monday is 0
-        return (self.buttons_active and (not GPIO.input(6))) or ( not  7 <= hour <= 22) or (day in {5, 6} and constants.NO_WEEKEND)
+        return ( not  7 <= hour <= 22) or (day in {5, 6} and constants.NO_WEEKEND)
     
     
     def getWaterLevel(self, measure_location):
-        #test button on
-        if self.buttons_active and (not GPIO.input(5)):
-            return 0, True
+
+        #Empty button on
+        currenttime = datetime.now().time();
+        day = datetime.today().weekday()
+        if (self.isEmptying(currenttime.hour, day)): 
+            return constants.NAP_COLUMN_LEVEL, True
         else:
-            #Empty button on
-            currenttime = datetime.now().time();
-            day = datetime.today().weekday()
-            if (self.isEmptying(currenttime.hour, day)): 
-                return constants.NAP_COLUMN_LEVEL, True
-            else:
-                if ((self.starttime + self.minutes_10 < datetime.now()) or (not measure_location in self.result)):
-            
-                    try:
-                        mask = bytearray(b'     ')
-                        if len(measure_location) <= 5 and len(measure_location) >= 2 and measure_location.isupper():
-                            byteCode = bytearray(measure_location.strip().encode('utf-8'))
-                            
-                            for idx, b in enumerate(bytearray(byteCode)):
-                                mask[idx] = b
-                        else:
-                            return 1, False
+            if ((self.starttime + self.minutes_10 < datetime.now()) or (not measure_location in self.result)):
+        
+                try:
+                    mask = bytearray(b'     ')
+                    if len(measure_location) <= 5 and len(measure_location) >= 2 and measure_location.isupper():
+                        byteCode = bytearray(measure_location.strip().encode('utf-8'))
                         
-                        if mask in self.validCodes():
-                            
-                            with urllib.request.urlopen(constants.RWS_URL) as response:
-                               zipFromURL = response.read()
-                               zippie = zipfile.ZipFile(BytesIO(zipFromURL))
-                               dat = zippie.read('update.dat')
-                               adm = zippie.read('update.adm')
+                        for idx, b in enumerate(bytearray(byteCode)):
+                            mask[idx] = b
+                    else:
+                        return 1, False
+                    
+                    if mask in self.validCodes():
+                        
+                        with urllib.request.urlopen(constants.RWS_URL) as response:
+                           zipFromURL = response.read()
+                           zippie = zipfile.ZipFile(BytesIO(zipFromURL))
+                           dat = zippie.read('update.dat')
+                           adm = zippie.read('update.adm')
+                           
+                           data = dat.splitlines()
+                        
+                           for idx, line in enumerate(adm.splitlines()):
                                
-                               data = dat.splitlines()
-                            
-                               for idx, line in enumerate(adm.splitlines()):
-                                   
-                                   if line[15:18] == b'H10' and line[4:9] == mask:
-                                      #print (data[idx][:len(data[idx])-1])
-                                      measures = str(data[idx][:len(data[idx])-1],'utf-8').split(",")
-                                      #print (measures, flush=True)
-                                      #level of NAP 
-                                      value = min( float(measures[len(measures)-1].strip()) / 100.0, constants.NAP_COLUMN_MAX_LEVEL)
-                                      
-                                      self.result[measure_location] = value
-                                      self.starttime = datetime.now()
-                                      #print("NAP {location} = {value} ".format(location = measure_location, value=value))
-                                      return value, True
-                        else:
-                            return 2, False
-                        
-                    except:
-                        logging.error(traceback.format_exc())
-                        return 3, False
-                else:
-                    return self.result[measure_location], True
-                
+                               if line[15:18] == b'H10' and line[4:9] == mask:
+                                  #print (data[idx][:len(data[idx])-1])
+                                  measures = str(data[idx][:len(data[idx])-1],'utf-8').split(",")
+                                  #print (measures, flush=True)
+                                  #level of NAP 
+                                  value = min( float(measures[len(measures)-1].strip()) / 100.0, constants.NAP_COLUMN_MAX_LEVEL)
+                                  
+                                  self.result[measure_location] = value
+                                  self.starttime = datetime.now()
+                                  #print("NAP {location} = {value} ".format(location = measure_location, value=value))
+                                  return value, True
+                    else:
+                        return 2, False
+                    
+                except:
+                    logging.error(traceback.format_exc())
+                    return 3, False
+            else:
+                return self.result[measure_location], True
+            
     def validCodes(self): 
     	return [	b'AMRO ',
     	b'AMRB ',
@@ -251,7 +248,6 @@ if __name__ == "__main__":
     #GPIO.setmode(GPIO.BCM)
     
     rws = RWS()
-    rws.buttons_active = False
     #print (rws.getWaterLevel(constants.COLUMN_1_LOCATION))
     #print (rws.getWaterLevel(constants.COLUMN_2_LOCATION))
     #print (rws.getWaterLevel(constants.COLUMN_1_LOCATION))
