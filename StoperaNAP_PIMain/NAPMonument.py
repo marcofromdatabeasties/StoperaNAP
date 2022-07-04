@@ -36,9 +36,9 @@ class NAPMonument:
         GPIO.setup(13, GPIO.IN) #reboot
         
         GPIO.output(12, GPIO.HIGH)
+        
         GPIO.add_event_detect(13, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=200)
         GPIO.add_event_detect(16, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=200)
-        
         GPIO.add_event_detect(5, GPIO.BOTH, callback=self.setNAPToZeroOrNot, bouncetime=200)
         GPIO.add_event_detect(6, GPIO.BOTH, callback=self.setNAPToEmptyOrNot, bouncetime=200)
         
@@ -61,9 +61,9 @@ class NAPMonument:
     #obsolete function in case of interrupt troubles on-site
     def buttonTesting(self):
         if (GPIO.input(13) or GPIO.input(16)):
-             self.shutdown_h_now(16)
+            self.shutdown_h_now(16)
         if (GPIO.input(5)):
-            self.setNAPToZeroOrNot( 5)
+            self.setNAPToZeroOrNot(5)
         if(GPIO.input(5)):
             self.setNAPToEmptyOrNot (6)
 
