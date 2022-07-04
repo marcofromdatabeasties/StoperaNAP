@@ -55,8 +55,8 @@ class NAPMonument:
         vlissingenthread.start()
 
         while True:
-            
-           time.sleep(60)
+            #buttonTesting()
+            time.sleep(60)
            
     #obsolete function in case of interrupt troubles on-site
     def buttonTesting(self):
