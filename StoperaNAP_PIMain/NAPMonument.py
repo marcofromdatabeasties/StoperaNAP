@@ -36,11 +36,11 @@ class NAPMonument:
         GPIO.setup(13, GPIO.IN) #reboot
         
         GPIO.output(12, GPIO.HIGH)
-        GPIO.add_event_detect(13, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=2000)
-        GPIO.add_event_detect(16, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=2000)
+        GPIO.add_event_detect(13, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=200)
+        GPIO.add_event_detect(16, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=200)
         
-        GPIO.add_event_detect(5, GPIO.BOTH, callback=self.setNAPToZeroOrNot, bouncetime=2000)
-        GPIO.add_event_detect(6, GPIO.BOTH, callback=self.setNAPToEmptyOrNot, bouncetime=2000)
+        GPIO.add_event_detect(5, GPIO.BOTH, callback=self.setNAPToZeroOrNot, bouncetime=200)
+        GPIO.add_event_detect(6, GPIO.BOTH, callback=self.setNAPToEmptyOrNot, bouncetime=200)
         
         self.screen = LCD()
        
@@ -55,7 +55,18 @@ class NAPMonument:
         vlissingenthread.start()
 
         while True:
+            
            time.sleep(60)
+           
+    #obsolete function in case of interrupt troubles on-site
+    def buttonTesting(self):
+        if (GPIO.input(13) or GPIO.input(16)):
+             self.shutdown_h_now(16)
+        if (GPIO.input(5)):
+            self.setNAPToZeroOrNot( 5)
+        if(GPIO.input(5)):
+            self.setNAPToEmptyOrNot (6)
+
 
     def shutdown_h_now(self, channel):
         time.sleep(0.05)
