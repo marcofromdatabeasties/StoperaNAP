@@ -37,10 +37,10 @@ class NAPMonument:
         
         GPIO.output(12, GPIO.HIGH)
         
-        GPIO.add_event_detect(13, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=200)
-        GPIO.add_event_detect(16, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=200)
-        GPIO.add_event_detect(5, GPIO.BOTH, callback=self.setNAPToZeroOrNot, bouncetime=200)
-        GPIO.add_event_detect(6, GPIO.BOTH, callback=self.setNAPToEmptyOrNot, bouncetime=200)
+        #GPIO.add_event_detect(13, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=200)
+        #GPIO.add_event_detect(16, GPIO.FALLING, callback=self.shutdown_h_now, bouncetime=200)
+        #GPIO.add_event_detect(5, GPIO.BOTH, callback=self.setNAPToZeroOrNot, bouncetime=200)
+        #GPIO.add_event_detect(6, GPIO.BOTH, callback=self.setNAPToEmptyOrNot, bouncetime=200)
         
         self.screen = LCD()
        
@@ -55,7 +55,7 @@ class NAPMonument:
         vlissingenthread.start()
 
         while True:
-            #buttonTesting()
+            #self.buttonTesting()
             time.sleep(60)
            
     #obsolete function in case of interrupt troubles on-site
