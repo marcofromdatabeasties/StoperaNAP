@@ -7,32 +7,27 @@ Created on Wed Oct 20 16:37:42 2021
 """
 
 import threading
-import spidev
-import RPi.GPIO as GPIO
+import board
+import busio
+import adafruit_ads1x15.ads1015 as ADS
+from adafruit_ads1x15.analog_in import AnalogIn
 import constants
+
 
 class Pressure:
     
     def __init__(self):
         self.lock = threading.Lock()
-        self.spi = spidev.SpiDev()
-        self.spi.open(0,0)
-        self.spi.max_speed_hz=1000000
-        
-        
-    #same thing but for the 12-bit MCP3208
-    def readChannel3208(self, channel):
-        adc = self.spi.xfer2([6|(channel>>2),channel<<6,0]) #0000011x,xx000000,00000000
-        data = ((adc[1]&15) << 8) + adc[2]
-        return data
-    
+        self.i2c = busio.I2C(board.SCL, board.SDA)  
+        self.ads = ADS.ADS1115(self.i2c)
+        self.ads.mode = ADS.Mode.CONTINUOUS
     
     def getColumnLevel(self, channel):
         self.lock.acquire(True, 10)
-        
-        GPIO.output(12, GPIO.LOW)
-        value = self.readChannel3208(channel)
-        GPIO.output(12, GPIO.HIGH)
+
+        value = AnalogIn(self.ads, channel).voltage       
         
         self.lock.release()
-        return constants.NAP_COLUMN_HEIGHT * ((value - 744) / 4096) #4mA minimal current of pressure sensor (gets 0.6v = 744).
+        #4mA minimal current of pressure sensor (gets 0.8v ).
+        #20mA max current is 4v
+        return constants.NAP_COLUMN_HEIGHT * ((value - 0.8) / 4) 

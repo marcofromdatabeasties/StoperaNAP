@@ -93,9 +93,9 @@ class WaterColumn:
                 self.counter = 0
                 self.previous_level = level_column
             #print ("Level Desired Column {0:2.2f}".format(level_desired))
-            screen.writeToScreen(self.channel, self.measure_location, self.state.getName(), level_column , level_desired)
+            screen.writeToScreen(self.measure_location, self.state.getName(), level_column , level_desired)
             time.sleep(constants.COLUMN_WAIT) 
-            
+                
             
 class WaterColumn1953(WaterColumn):
     
@@ -118,7 +118,7 @@ class WaterColumn1953(WaterColumn):
                 self.starttime = datetime.now()
                 
             self.state = self.state.execute(self.measure_location, level_column, level_desired,  self.pin_valve, self.pin_pump)
-            screen.writeToScreen(self.channel, self.measure_location, self.state.getName(), self.level_column , self.level_desired)
+            screen.writeToScreen( self.measure_location, self.state.getName(), self.level_column , self.level_desired)
             time.sleep(constants.COLUMN_WAIT)               
                 
                 

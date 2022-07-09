@@ -25,14 +25,14 @@ class LCD:
         self.lcd.write_string("V3.0 St. NAP/RWS")
         self.lock.release()
 
-    def writeToScreen(self, channel, location, status, current_level , desired_level):
+    def writeToScreen(self, location, status, current_level , desired_level):
         self.lock.acquire(True, 10)
         
         text = ("{location} {status} {current_level:0.2f}/{desired_level:0.2f}" + (' ' * 20)).format(
                 location = location, status = status, 
                 current_level=current_level , desired_level = desired_level)[:20]
         #print(text)
-        self.lcd.cursor_pos = (channel, 0)
+        self.lcd.cursor_pos = (constants.ROW[self.location], 0)
         self.lcd.write_string(text)
         self.lock.release()
         
@@ -41,3 +41,11 @@ class LCD:
         self.lcd.cursor_pos = (3, 0)
         self.lcd.write_string(("{message}" + (' ' * 20)).format(message = message[:20])[:20])
         self.lock.release()
+        
+    def clear(self):
+        for i in [0,1,2]:
+            self.lcd.cursor_pos = (i, 0)
+            self.lcd.write_string(' ' * 20)
+        
+        
+        
