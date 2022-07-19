@@ -14,7 +14,7 @@ from adafruit_ads1x15.analog_in import AnalogIn
 import constants
 
 
-class Pressure:
+class PressureSensor:
     
     def __init__(self):
         self.lock = threading.Lock()

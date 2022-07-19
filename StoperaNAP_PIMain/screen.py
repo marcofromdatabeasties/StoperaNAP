@@ -8,6 +8,7 @@ Created on Sat Oct 23 21:45:15 2021
 
 from RPLCD.i2c import CharLCD
 import threading
+import constants
 
 
 class LCD:

@@ -16,7 +16,6 @@ from pressure import Pressure
 from datetime import timedelta
 from datetime import datetime
 import constants
-import asyncio
 
 class WaterColumn:
     state = states.NoWhere()
@@ -32,69 +31,64 @@ class WaterColumn:
     previous_desired = 0
     
     
-    def __init__(self, location, channel, pin_valve, pin_pump ):
+    def __init__(self, location, channel, pin_valve, pin_pump, pressureSensor, screen ):
         self.channel = channel
         self.measure_location = location
         self.pin_pump = pin_pump
         self.pin_valve = pin_valve
         self.zero = False
         self.empty = False
-        self.lock = asyncio.Lock()
+        self.pressureSensor = pressureSensor
+        self.screen = screen
         
     def getWaterLevel(self):
-        async with self.lock: 
-            if (self.zero):
-                return 0, True
-            if (self.empty):
-                return constants.NAP_COLUMN_LEVEL, True
-            return self.rws.getWaterLevel(self.measure_location)
+        if (self.zero):
+            return 0, True
+        if (self.empty):
+            return constants.NAP_COLUMN_LEVEL, True
+        return self.rws.getWaterLevel(self.measure_location)
     
     def setLevelToZero(self):
-        async with self.lock:
-            #only set when empty is false
-            self.zero = not self.empty
+        #only set when empty is false
+        self.zero = not self.empty
     
     def setLevelToEmpty(self):
-        async with self.lock:
-            #only set when zero  is false
-            self.empty = not self.zero
+        #only set when zero  is false
+        self.empty = not self.zero
         
     def setToNormal(self):
-        async with self.lock:
-            self.zero = False
-            self.empty = False
+        self.zero = False
+        self.empty = False
             
     def runWorlds(self, screen):
-        while True:
-            #NAP start  + NAP level equals column height 
-            level_column = constants.NAP_COLUMN_LEVEL + self.pressureSensor.getColumnLevel(self.channel)
-                
-            level_desired, ok = self.getWaterLevel() 
+        #NAP start  + NAP level equals column height 
+        level_column = constants.NAP_COLUMN_LEVEL + self.pressureSensor.getColumnLevel(self.channel)
             
-            if (ok):
-                self.previous_desired = level_desired
-            else:
-                #print("error")
-                
-                level_desired = self.previous_desired
+        level_desired, ok = self.getWaterLevel() 
+        
+        if (ok):
+            self.previous_desired = level_desired
+        else:
+            #print("error")
             
-            if (ok):
-                self.state = self.state.execute(self.measure_location, level_column, level_desired,  self.pin_valve, self.pin_pump, screen)
-            else:
+            level_desired = self.previous_desired
+        
+        if (ok):
+            self.state = self.state.execute(self.measure_location, level_column, level_desired,  self.pin_valve, self.pin_pump, screen)
+        else:
+            self.state = states.Error()
+        
+        #check if an hardware error is occuring
+        if (self.previous_level == level_column and level_desired > level_column):
+            self.counter += 1
+            if (self.counter > constants.TEN_S_EQUAL_ERROR_COUNT): #no change in water level after x iterations, something is wrong -> Error
                 self.state = states.Error()
-            
-            #check if an hardware error is occuring
-            if (self.previous_level == level_column and level_desired > level_column):
-                self.counter += 1
-                if (self.counter > constants.TEN_S_EQUAL_ERROR_COUNT): #no change in water level after x iterations, something is wrong -> Error
-                    self.state = states.Error()
-                    
-            else:
-                self.counter = 0
-                self.previous_level = level_column
-            #print ("Level Desired Column {0:2.2f}".format(level_desired))
-            screen.writeToScreen(self.measure_location, self.state.getName(), level_column , level_desired)
-            time.sleep(constants.COLUMN_WAIT) 
+                
+        else:
+            self.counter = 0
+            self.previous_level = level_column
+        #print ("Level Desired Column {0:2.2f}".format(level_desired))
+        self.screen.writeToScreen(self.measure_location, self.state.getName(), level_column , level_desired)
                 
             
 class WaterColumn1953(WaterColumn):

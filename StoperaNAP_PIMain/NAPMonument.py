@@ -9,13 +9,13 @@ Main class that symbolizes the monument, containing three cylinders two of which
 display the current water level at IJmuiden en Zierikzee and one displaying the
 level of the 1953 flood.
 """
-import threading
 from water import WaterColumn
 import time
 import RPi.GPIO as GPIO
 from screen import LCD
 import constants
 import os
+from pressure import PressureSensor
 
 class NAPMonument:
      
@@ -31,9 +31,9 @@ class NAPMonument:
         GPIO.output(constants.VL_VLISSINGEN, GPIO.HIGH)
         #GPIO.output(constants.VL_53, GPIO.HIGH)
         
-        GPIO.output(constants.PUMP_IJMUIDEN, GPIO.LOW)
-        GPIO.output(constants.PUMP_VLISSINGEN, GPIO.LOW)
-        GPIO.output(constants.PUMP_53, GPIO.LOW)
+        GPIO.output(constants.PUMP_IJMUIDEN, GPIO.HIGH)
+        GPIO.output(constants.PUMP_VLISSINGEN, GPIO.HIGH)
+        #GPIO.output(constants.PUMP_53, GPIO.LOW)
         
         
         GPIO.setup(constants.BTN_SHUTDOWN, GPIO.IN, GPIO.PUD_UP)
@@ -41,21 +41,23 @@ class NAPMonument:
         GPIO.setup(constants.BTN_NAP, GPIO.IN, GPIO.PUD_UP) 
         
         self.screen = LCD()
+        self.pressureSensor = PressureSensor()
        
     def start(self):
         self.IJmuiden = WaterColumn(constants.COLUMN_1_LOCATION, constants.PR_IJMUIDEN
-                                    , constants.VL_IJMUIDEN, constants.PUMP_IJMUIDEN) 
-        self.Vlissingen = WaterColumn(constants.COLUMN_2_LOCATION, constants.PR_VLISSINGEN, constants.VL_VLISSINGEN,constants.PUMP_VLISSINGEN)
+                                    , constants.VL_IJMUIDEN, constants.PUMP_IJMUIDEN
+                                    , self.pressureSensor, self.screen) 
+        self.Vlissingen = WaterColumn(constants.COLUMN_2_LOCATION, constants.PR_VLISSINGEN,
+                                      constants.VL_VLISSINGEN,constants.PUMP_VLISSINGEN
+                                      , self.pressureSensor, self.screen)
         #self.Watersnood = WaterColumn1953("1953", 2, 20, 21)
 
-        ijmuidenthread = threading.Thread(target=self.IJmuiden.runWorlds, args=(self.screen,), daemon=True)
-        vlissingenthread = threading.Thread(target=self.Vlissingen.runWorlds, args=(self.screen,), daemon=True)
-        ijmuidenthread.start()
-        vlissingenthread.start()
 
         while True:
             self.buttonTesting()
-            time.sleep(0.1)
+            self.IJmuiden.runWorlds(self.screen)
+            self.Vlissingen.runWorlds(self.screen)
+            time.sleep(constants.COLUMN_WAIT)
            
     #obsolete function in case of interrupt troubles on-site
     def buttonTesting(self):
