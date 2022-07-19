@@ -16,6 +16,7 @@ from screen import LCD
 import constants
 import os
 from pressure import PressureSensor
+from government import RWS 
 
 class NAPMonument:
      
@@ -42,14 +43,15 @@ class NAPMonument:
         
         self.screen = LCD()
         self.pressureSensor = PressureSensor()
+        self.rws = RWS()
        
     def start(self):
         self.IJmuiden = WaterColumn(constants.COLUMN_1_LOCATION, constants.PR_IJMUIDEN
                                     , constants.VL_IJMUIDEN, constants.PUMP_IJMUIDEN
-                                    , self.pressureSensor, self.screen) 
+                                    , self.pressureSensor, self.screen, self.rws) 
         self.Vlissingen = WaterColumn(constants.COLUMN_2_LOCATION, constants.PR_VLISSINGEN,
                                       constants.VL_VLISSINGEN,constants.PUMP_VLISSINGEN
-                                      , self.pressureSensor, self.screen)
+                                      , self.pressureSensor, self.screen, self.rws)
         #self.Watersnood = WaterColumn1953("1953", 2, 20, 21)
 
 

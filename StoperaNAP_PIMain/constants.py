@@ -15,7 +15,8 @@ NAP_COLUMN_MAX_LEVEL = {
     "RPBU": 4.0  #max_level
 }
 TEN_S_EQUAL_ERROR_COUNT = 50 #times level stays the same
-COLUMN_WAIT = 2 
+#with a column width of 50cm and a pump of 120Lt/min, a centimeter column is 0,31 ltr so a reaction time of 2g = 159 ms. 
+COLUMN_WAIT = 0.079  
 CYCLE_TIME_1953=15
 RWS_URL="https://www.rijkswaterstaat.nl/rws/opendata/meetdata/meetdata.zip"
 COLUMN_1_LOCATION="IJMH"
@@ -27,7 +28,8 @@ NO_WEEKEND = True #run on weekend (False) or not
 #screen
 ROW = {
     "IJMH": 0, 
-    "RPBU": 1  
+    "RPBU": 1,
+    "1953" : 2
 }
 
 #pinouts

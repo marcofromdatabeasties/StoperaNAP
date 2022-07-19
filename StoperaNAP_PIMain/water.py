@@ -11,7 +11,6 @@ This file holds the water columns type
 
 import time
 import states
-import government
 from pressure import Pressure
 from datetime import timedelta
 from datetime import datetime
@@ -23,7 +22,6 @@ class WaterColumn:
     pin_valve = -1
     pin_pump = -1
     pressureSensor = Pressure()
-    rws = government.RWS()
     
     counter = 0;
     
@@ -31,7 +29,7 @@ class WaterColumn:
     previous_desired = 0
     
     
-    def __init__(self, location, channel, pin_valve, pin_pump, pressureSensor, screen ):
+    def __init__(self, location, channel, pin_valve, pin_pump, pressureSensor, screen, rws ):
         self.channel = channel
         self.measure_location = location
         self.pin_pump = pin_pump
@@ -40,6 +38,7 @@ class WaterColumn:
         self.empty = False
         self.pressureSensor = pressureSensor
         self.screen = screen
+        self.rws = rws
         
     def getWaterLevel(self):
         if (self.zero):
