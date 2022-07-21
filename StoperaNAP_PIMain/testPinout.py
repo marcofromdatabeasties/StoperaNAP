@@ -29,12 +29,6 @@ if __name__ == "__main__":
     GPIO.setup(constants.VL_IJMUIDEN, GPIO.OUT)
     GPIO.setup(constants.VL_VLISSINGEN, GPIO.OUT)
     
-    GPIO.output(constants.VL_IJMUIDEN, GPIO.HIGH)
-    GPIO.output(constants.VL_VLISSINGEN, GPIO.HIGH)
-    
-    GPIO.output(constants.PUMP_IJMUIDEN, GPIO.HIGH)
-    GPIO.output(constants.PUMP_VLISSINGEN, GPIO.HIGH)
-    
     
     while (True):
                 
