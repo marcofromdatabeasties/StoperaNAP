@@ -9,11 +9,8 @@ This file holds the water columns type
 
 """
 
-import time
 import states
 from pressure import Pressure
-from datetime import timedelta
-from datetime import datetime
 import constants
 
 class WaterColumn:
@@ -59,7 +56,7 @@ class WaterColumn:
         self.zero = False
         self.empty = False
             
-    def runWorlds(self, screen):
+    def runWorlds(self):
         #NAP start  + NAP level equals column height 
         level_column = constants.NAP_COLUMN_LEVEL + self.pressureSensor.getColumnLevel(self.channel)
             
@@ -73,7 +70,7 @@ class WaterColumn:
             level_desired = self.previous_desired
         
         if (ok):
-            self.state = self.state.execute(self.measure_location, level_column, level_desired,  self.pin_valve, self.pin_pump, screen)
+            self.state = self.state.execute(self.measure_location, level_column, level_desired,  self.pin_valve, self.pin_pump, self.screen)
         else:
             self.state = states.Error()
         
@@ -88,31 +85,6 @@ class WaterColumn:
             self.previous_level = level_column
         #print ("Level Desired Column {0:2.2f}".format(level_desired))
         self.screen.writeToScreen(self.measure_location, self.state.getName(), level_column , level_desired)
-                
-            
-class WaterColumn1953(WaterColumn):
-    
-    starttime=datetime.now()
-    cycletime = timedelta(minutes=constants.CYCLE_TIME_1953)
-    highorlow = False
-    
-    def __init__(self, location, channel, pin_valve, pin_pump ):
-        super().__init__(location, channel, pin_valve, pin_pump)
-        
-    def runWorlds(self, screen):
-        while True:
-            level_column = constants.NAP_COLUMN_LEVEL + self.pressureSensor.getColumnLevel(self.channel)
-            if (self.highorlow):
-                level_desired = 4.55 #https://www.rijkswaterstaat.nl/water/waterbeheer/bescherming-tegen-het-water/watersnoodramp-1953
-            else:
-                level_desired = constants.NAP_COLUMN_LEVEL
-            if (self.starttime + self.cycletime < datetime.now()):
-                self.highorlow = not self.highorlow
-                self.starttime = datetime.now()
-                
-            self.state = self.state.execute(self.measure_location, level_column, level_desired,  self.pin_valve, self.pin_pump)
-            screen.writeToScreen( self.measure_location, self.state.getName(), self.level_column , self.level_desired)
-            time.sleep(constants.COLUMN_WAIT)               
                 
                 
         

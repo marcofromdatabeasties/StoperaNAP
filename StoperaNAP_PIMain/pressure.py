@@ -31,3 +31,9 @@ class PressureSensor:
         #4mA minimal current of pressure sensor (gets 0.8v ).
         #20mA max current is 4v
         return constants.NAP_COLUMN_HEIGHT * ((value - 0.8) / 4) 
+    
+    
+if __name__ == "__main__":
+    pressure = PressureSensor()
+    print(pressure.getColumnLevel(ADS.P1))
+        
