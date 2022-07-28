@@ -10,7 +10,7 @@ This file holds the water columns type
 """
 
 import states
-from pressure import Pressure
+from pressure import PressureSensor
 import constants
 
 class WaterColumn:
@@ -18,7 +18,7 @@ class WaterColumn:
     measure_location = ""
     pin_valve = -1
     pin_pump = -1
-    pressureSensor = Pressure()
+    pressureSensor = PressureSensor()
     
     counter = 0;
     
