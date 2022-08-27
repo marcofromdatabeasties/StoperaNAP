@@ -33,7 +33,7 @@ class LCD:
                 location = location, status = status, 
                 current_level=current_level , desired_level = desired_level)[:20]
         #print(text)
-        self.lcd.cursor_pos = (constants.ROW[self.location], 0)
+        self.lcd.cursor_pos = (constants.ROW[location], 0)
         self.lcd.write_string(text)
         self.lock.release()
         
