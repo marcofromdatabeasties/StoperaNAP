@@ -63,22 +63,22 @@ class NAPMonument:
            
     #obsolete function in case of interrupt troubles on-site
     def buttonTesting(self):
-        if GPIO.input(constants.BTN_SHUTDOWN) == GPIO.HIGH:
+        if GPIO.input(constants.BTN_SHUTDOWN) == GPIO.LOW:
             self.shutdown_h_now()
         
-        if GPIO.input(constants.BTN_NAP == GPIO.HIGH):
+        if GPIO.input(constants.BTN_NAP == GPIO.LOW):
             self.setNAPToZeroOrNot()
         else:
             self.Vlissingen.setToNormal()
             self.IJmuiden.setToNormal()
         
-        if GPIO.input(constants.BTN_EMPTY) == GPIO.HIGH:
+        if GPIO.input(constants.BTN_EMPTY) == GPIO.LOW:
             self.setNAPToEmptyOrNot()
         else:
             self.Vlissingen.setToNormal()
             self.IJmuiden.setToNormal()
 
-    def shutdown_h_now(self, channel):
+    def shutdown_h_now(self):
         time.sleep(0.05)
         GPIO.cleanup()
         self.screen.clear()
