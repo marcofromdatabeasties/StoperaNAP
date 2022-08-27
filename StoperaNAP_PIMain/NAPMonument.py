@@ -66,7 +66,7 @@ class NAPMonument:
         if GPIO.input(constants.BTN_SHUTDOWN) == GPIO.LOW:
             self.shutdown_h_now()
         
-        if GPIO.input(constants.BTN_NAP == GPIO.LOW):
+        if GPIO.input(constants.BTN_NAP) == GPIO.LOW:
             self.setNAPToZeroOrNot()
         else:
             self.Vlissingen.setToNormal()
