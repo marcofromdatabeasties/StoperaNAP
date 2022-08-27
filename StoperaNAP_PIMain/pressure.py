@@ -9,7 +9,7 @@ Created on Wed Oct 20 16:37:42 2021
 import threading
 import board
 import busio
-import adafruit_ads1x15.ads1015 as ADS
+import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 import constants
 
