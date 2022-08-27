@@ -14,6 +14,8 @@ ERROR = 3; // world 4: water in kolom veranderd niet / meting onjuist/ error wor
 START = 4; //world 5: starting (INet)
 NOWHERE = 5;//boot
 
+Remember LOW = on
+
 """
 import socket
 import logging
@@ -68,8 +70,8 @@ class NoWhere(State):
 class Good(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
         logging.info("%s = Level good ", location)
-        GPIO.output(pin_valve, GPIO.LOW)
-        GPIO.output(pin_pump, GPIO.LOW)
+        GPIO.output(pin_valve, GPIO.HIGH)
+        GPIO.output(pin_pump, GPIO.HIGH)
         return self.handleState(level_column, level_desired) 
    
     def getName(self):
@@ -79,8 +81,8 @@ class Good(State):
 class High(State):
     def execute(self, location,level_column, level_desired, pin_valve, pin_pump, screen):
         logging.info("%s = Too high ", location)
-        GPIO.output(pin_valve, GPIO.HIGH)
-        GPIO.output(pin_pump, GPIO.LOW)
+        GPIO.output(pin_valve, GPIO.LOW)
+        GPIO.output(pin_pump, GPIO.HIGH)
         return self.handleState(level_column, level_desired)
     
     def getName(self):
@@ -89,8 +91,8 @@ class High(State):
 class Low(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
         logging.info("%s = Too low", location)
-        GPIO.output(pin_valve, GPIO.LOW)
-        GPIO.output(pin_pump, GPIO.HIGH)
+        GPIO.output(pin_valve, GPIO.HIGH)
+        GPIO.output(pin_pump, GPIO.LOW)
         return self.handleState(level_column, level_desired)
 
     def getName(self):
@@ -108,8 +110,8 @@ class Start(State):
 class Error(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
         logging.info("%s = Error", location)
-        GPIO.output(pin_valve, GPIO.LOW)
-        GPIO.output(pin_pump, GPIO.LOW)
+        GPIO.output(pin_valve, GPIO.HIGH)
+        GPIO.output(pin_pump, GPIO.HIGH)
         return self
    
     def getName(self):
