@@ -30,13 +30,13 @@ class NAPMonument:
         GPIO.setup(constants.VL_IJMUIDEN, GPIO.OUT)
         GPIO.setup(constants.VL_VLISSINGEN, GPIO.OUT)
         
-        GPIO.output(constants.VL_IJMUIDEN, GPIO.LOW)
-        GPIO.output(constants.VL_VLISSINGEN, GPIO.LOW)
-        GPIO.output(constants.VL_53, GPIO.LOW)
+        GPIO.output(constants.VL_IJMUIDEN, GPIO.HIGH)
+        GPIO.output(constants.VL_VLISSINGEN, GPIO.HIGH)
+        GPIO.output(constants.VL_53, GPIO.HIGH)
         
-        GPIO.output(constants.PUMP_IJMUIDEN, GPIO.LOW)
-        GPIO.output(constants.PUMP_VLISSINGEN, GPIO.LOW)
-        GPIO.output(constants.PUMP_53, GPIO.LOW)
+        GPIO.output(constants.PUMP_IJMUIDEN, GPIO.HIGH)
+        GPIO.output(constants.PUMP_VLISSINGEN, GPIO.HIGH)
+        GPIO.output(constants.PUMP_53, GPIO.HIGH)
         
         
         GPIO.setup(constants.BTN_SHUTDOWN, GPIO.IN, GPIO.PUD_UP)
