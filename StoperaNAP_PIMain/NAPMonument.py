@@ -57,8 +57,8 @@ class NAPMonument:
 
         while True:
             self.buttonTesting()
-            self.IJmuiden.runWorlds(self.screen)
-            self.Vlissingen.runWorlds(self.screen)
+            self.IJmuiden.runWorlds()
+            self.Vlissingen.runWorlds()
             time.sleep(constants.COLUMN_WAIT)
            
     #obsolete function in case of interrupt troubles on-site
