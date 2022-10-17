@@ -75,7 +75,7 @@ class RWS:
                     
                 except:
                     logging.error(traceback.format_exc())
-                    return 3, False
+                    return constants.NAP_COLUMN_LEVEL, True
             else:
                 return self.result[measure_location], True
             
