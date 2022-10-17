@@ -7,6 +7,7 @@ Created on Sat Oct 23 21:45:15 2021
 """
 
 from RPLCD.i2c import CharLCD
+import time
 
 
 class LCD:
@@ -20,11 +21,11 @@ class LCD:
     def __init__(self):
         self.lcd.cursor_pos = (3, 0)
         self.lcd.write_string("V3.0 St. NAP/RWS")
-        self.i = 0
+        self.ms = time.time()*1000.0
 
     def writeToScreen(self, location, status, current_level , desired_level, screenRow):
         
-        if (self.i % 2 == 0):
+        if (self.ms + 1000 < time.time()*1000.0):
         
             text = ("{location} {status}{current_level:0.2f}/{desired_level:0.2f}" + (' ' * 20)).format(
                     location = location, status = status, 
@@ -33,8 +34,8 @@ class LCD:
             #print(text)
             self.lcd.cursor_pos = (screenRow, 0)
             self.lcd.write_string(text)
-        
-        self.i = self.i + 1
+            self.ms = time.time()*1000.0
+    
         
     def writeInfoToScreen(self, message):
         self.lcd.cursor_pos = (3, 0)
