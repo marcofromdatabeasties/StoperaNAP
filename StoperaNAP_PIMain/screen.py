@@ -24,21 +24,21 @@ class LCD:
 
     def writeToScreen(self, location, status, current_level , desired_level):
         
-        text = ("{location} {status} {current_level:0.2f}/{desired_level:0.2f}" + (' ' * 19)).format(
+        text = ("{location} {status} {current_level:0.2f}/{desired_level:0.2f}" + (' ' * 20)).format(
                 location = location, status = status, 
                 current_level=current_level , desired_level = desired_level)[:19]
         #print(text)
-        self.lcd.cursor_pos = (constants.ROW[location], 0)
+        self.lcd.cursor_pos = constants.ROW[location]
         self.lcd.write_string(text)
         
     def writeInfoToScreen(self, message):
         self.lcd.cursor_pos = (3, 0)
-        self.lcd.write_string(("{message}" + (' ' * 19)).format(message = message[:19])[:19])
+        self.lcd.write_string(("{message}" + (' ' * 20)).format(message = message[:19])[:19])
         
     def clear(self):
         for i in [0,1,2]:
             self.lcd.cursor_pos = (i, 0)
-            self.lcd.write_string(' ' * 19)
+            self.lcd.write_string(' ' * 20)
         
         
         
