@@ -22,10 +22,11 @@ class LCD:
         self.lcd.cursor_pos = (3, 0)
         self.lcd.write_string("V3.0 St. NAP/RWS")
         self.ms = time.time()*1000.0
+        self.lastRow = -1
 
     def writeToScreen(self, location, status, current_level , desired_level, screenRow):
         
-        if (self.ms + 1000 < time.time()*1000.0):
+        if (self.ms + 1000 < time.time()*1000.0) and self.lastRow != screenRow:
         
             text = ("{location} {status}{current_level:0.2f}/{desired_level:0.2f}" + (' ' * 20)).format(
                     location = location, status = status, 
@@ -35,6 +36,7 @@ class LCD:
             self.lcd.cursor_pos = (screenRow, 0)
             self.lcd.write_string(text)
             self.ms = time.time()*1000.0
+            self.lastRow = screenRow
     
         
     def writeInfoToScreen(self, message):
