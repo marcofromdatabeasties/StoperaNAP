@@ -20,15 +20,20 @@ class LCD:
     def __init__(self):
         self.lcd.cursor_pos = (3, 0)
         self.lcd.write_string("V3.0 St. NAP/RWS")
+        self.i = 0
 
     def writeToScreen(self, location, status, current_level , desired_level, screenRow):
         
-        text = (("{location} {status} {current_level:0.2f}/{desired_level:0.2f}" + (' ' * 20)).format(
-                location = location, status = status, 
-                current_level=current_level , desired_level = desired_level)[:19])
-        #print(text)
-        self.lcd.cursor_pos = (screenRow, 0)
-        self.lcd.write_string(text)
+        if (self.i % 0):
+        
+            text = ("{location} {status}{current_level:0.2f}/{desired_level:0.2f}" + (' ' * 20)).format(
+                    location = location, status = status, 
+                    current_level=current_level , desired_level = desired_level)
+            text = text[:19]
+            #print(text)
+            self.lcd.cursor_pos = (screenRow, 0)
+            self.lcd.write_string(text)
+        self.i = self.i + 1
         
     def writeInfoToScreen(self, message):
         self.lcd.cursor_pos = (3, 0)
