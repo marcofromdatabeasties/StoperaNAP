@@ -31,7 +31,7 @@ class PressureSensor:
         #4mA minimal current of pressure sensor (gets 0.8v ).
         #20mA max current is 4v
         #return constants.NAP_COLUMN_HEIGHT * ((value - 0.8) / 2) 
-        return constants.NAP_COLUMN_LEVEL + (value * 3.25 -2.59)
+        return (value * 3.25 -2.59)
     
     
 if __name__ == "__main__":
