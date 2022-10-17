@@ -7,7 +7,6 @@ Created on Sat Oct 23 21:45:15 2021
 """
 
 from RPLCD.i2c import CharLCD
-import constants
 
 
 class LCD:
@@ -15,7 +14,7 @@ class LCD:
     lcd = CharLCD(i2c_expander='PCF8574', address=0x27, port=1,
               cols=20, rows=4, dotsize=8,
               charmap='A02',
-              auto_linebreaks=True,
+              auto_linebreaks=False,
               backlight_enabled=True)
     
     def __init__(self):
@@ -24,16 +23,16 @@ class LCD:
 
     def writeToScreen(self, location, status, current_level , desired_level, screenRow):
         
-        text = ("{location} {status} {current_level:0.2f}/{desired_level:0.2f}" + (' ' * 20)).format(
+        text = (("{location} {status} {current_level:0.2f}/{desired_level:0.2f}" + (' ' * 20)).format(
                 location = location, status = status, 
-                current_level=current_level , desired_level = desired_level)[:19]
+                current_level=current_level , desired_level = desired_level)[:19])
         #print(text)
         self.lcd.cursor_pos = (screenRow, 0)
         self.lcd.write_string(text)
         
     def writeInfoToScreen(self, message):
         self.lcd.cursor_pos = (3, 0)
-        self.lcd.write_string(("{message}" + (' ' * 20)).format(message = message[:19])[:19])
+        self.lcd.write_string((("{message}" + (' ' * 20)).format(message = message[:19])[:19]))
         
     def clear(self):
         for i in [0,1,2]:
