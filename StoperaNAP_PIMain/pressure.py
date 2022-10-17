@@ -30,7 +30,7 @@ class PressureSensor:
         self.lock.release()
         #4mA minimal current of pressure sensor (gets 0.8v ).
         #20mA max current is 4v
-        return constants.NAP_COLUMN_HEIGHT * ((value - 0.8) / 4) 
+        return constants.NAP_COLUMN_HEIGHT * ((value - 0.8) / 3.22) 
     
     
 if __name__ == "__main__":
