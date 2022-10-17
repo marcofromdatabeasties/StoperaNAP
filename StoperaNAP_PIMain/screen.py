@@ -22,13 +22,13 @@ class LCD:
         self.lcd.cursor_pos = (3, 0)
         self.lcd.write_string("V3.0 St. NAP/RWS")
 
-    def writeToScreen(self, location, status, current_level , desired_level):
+    def writeToScreen(self, location, status, current_level , desired_level, screenRow):
         
         text = ("{location} {status} {current_level:0.2f}/{desired_level:0.2f}" + (' ' * 20)).format(
                 location = location, status = status, 
                 current_level=current_level , desired_level = desired_level)[:19]
         #print(text)
-        self.lcd.cursor_pos = constants.ROW[location]
+        self.lcd.cursor_pos = (screenRow, 0)
         self.lcd.write_string(text)
         
     def writeInfoToScreen(self, message):

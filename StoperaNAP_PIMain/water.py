@@ -26,7 +26,7 @@ class WaterColumn:
     previous_desired = 0
     
     
-    def __init__(self, location, channel, pin_valve, pin_pump, pressureSensor, screen, rws ):
+    def __init__(self, location, channel, pin_valve, pin_pump, pressureSensor, screen, rws, screenRow ):
         self.channel = channel
         self.measure_location = location
         self.pin_pump = pin_pump
@@ -36,6 +36,7 @@ class WaterColumn:
         self.pressureSensor = pressureSensor
         self.screen = screen
         self.rws = rws
+        self.screenRow = screenRow
         
     def getWaterLevel(self):
         if (self.zero):
@@ -84,7 +85,8 @@ class WaterColumn:
             self.counter = 0
             self.previous_level = level_column
         #print ("Level Desired Column {0:2.2f}".format(level_desired))
-        self.screen.writeToScreen(self.measure_location, self.state.getName(), level_column , level_desired)
+        self.screen.writeToScreen(self.measure_location, self.state.getName(), level_column 
+                                  , level_desired, self.screenRow)
                 
                 
         
