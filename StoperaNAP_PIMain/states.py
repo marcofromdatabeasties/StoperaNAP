@@ -21,8 +21,13 @@ import socket
 import logging
 import RPi.GPIO as GPIO
 import constants
+import time 
 
 class State:
+   
+    start_time = -1
+    delta_time = 0
+    
     def handleState(self, level_column, level_desired):
         
         level_desired_min = level_desired - abs(level_desired * constants.ACCURACY_OF_COLUMN)
@@ -31,15 +36,23 @@ class State:
         level_column_min = level_column - abs(level_column * constants.ACCURACY_OF_COLUMN)
         level_column_max = level_column + abs(level_column * constants.ACCURACY_OF_COLUMN)
 
+        new_state = Start()
         
-        if (level_column_min <= level_desired <= level_column_max ):
-            return Good()
+        if self.start_time + self.delta_time <= time():
+            new_state = Pauze()
         else:
-            if (level_column_min < level_desired_min):
-                return Low()
+            #no pause
+            if (level_column_min <= level_desired <= level_column_max ):
+                new_state = Good()
             else:
-                if (level_column_max > level_desired_max):
-                    return High()
+                if (level_column_min < level_desired_min):
+                    new_state = Low()
+                    self.start_time = time()
+                    self.delta_time = min(3, abs(level_desired_min * 100 - level_column_min * 100)) 
+                else:
+                    if (level_column_max > level_desired_max):
+                        new_state = High()
+        return new_state
 
 class NoWhere(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
@@ -77,12 +90,33 @@ class Good(State):
     def getName(self):
         return "G"
     
+class Off(State):
+        def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
+            logging.info("%s = off", location)
+            GPIO.output(pin_valve, GPIO.HIGH)
+            GPIO.output(pin_pump, GPIO.HIGH)
+            return self.handleState(level_column, level_desired) 
+       
+        def getName(self):
+            return "U"
+    
+class Pauze(State):
+    def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
+        logging.info("%s = pauze", location)
+        
+        return Off()
+   
+    def getName(self):
+        return "P"        
+    
 
 class High(State):
     def execute(self, location,level_column, level_desired, pin_valve, pin_pump, screen):
         logging.info("%s = Too high ", location)
         GPIO.output(pin_valve, GPIO.LOW)
         GPIO.output(pin_pump, GPIO.HIGH)
+        
+        
         return self.handleState(level_column, level_desired)
     
     def getName(self):
@@ -93,6 +127,7 @@ class Low(State):
         logging.info("%s = Too low", location)
         GPIO.output(pin_valve, GPIO.HIGH)
         GPIO.output(pin_pump, GPIO.LOW)
+        
         return self.handleState(level_column, level_desired)
 
     def getName(self):

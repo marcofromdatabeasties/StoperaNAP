@@ -26,6 +26,7 @@ class LCD:
 
     def writeToScreen(self, location, status, current_level , desired_level, screenRow):
         
+        #timing to reduce screen update problems.
         if (self.ms + 1000 < time.time()*1000.0) and self.lastRow != screenRow:
         
             text = ("{location} {status}{current_level:0.2f}/{desired_level:0.2f}" + (' ' * 20)).format(
