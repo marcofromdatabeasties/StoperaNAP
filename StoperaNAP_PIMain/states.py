@@ -38,21 +38,31 @@ class State:
 
         new_state = Start()
         
-        if self.start_time + self.delta_time <= time.time():
+        if self.start_time + self.delta_time > time.time():
             new_state = Pauze()
         else:
             #no pause
             if (level_column_min <= level_desired <= level_column_max ):
                 new_state = Good()
+                self.start_time = -1
+                self.delta_time = 0
             else:
                 if (level_column_min < level_desired_min):
                     new_state = Low()
-                    self.start_time = time.time()
-                    self.delta_time = min(3, abs(level_desired_min * 100 - level_column_min * 100)) 
+                    self.start_time = -1
+                    self.delta_time = 0                    
                 else:
                     if (level_column_max > level_desired_max):
                         new_state = High()
+
+                        self.start_time = time.time()
+                        self.delta_time = min(3, abs(level_desired_min * 100 - level_column_min * 100)) 
         return new_state
+    
+    def resetTime(self):
+        self.start_time = -1
+        self.delta_time = 0         
+        
 
 class NoWhere(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
@@ -95,10 +105,13 @@ class Off(State):
             logging.info("%s = off", location)
             GPIO.output(pin_valve, GPIO.HIGH)
             GPIO.output(pin_pump, GPIO.HIGH)
+            
+            self.resetTime()
+            
             return self.handleState(level_column, level_desired) 
        
         def getName(self):
-            return "U"
+            return "R"
     
 class Pauze(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
