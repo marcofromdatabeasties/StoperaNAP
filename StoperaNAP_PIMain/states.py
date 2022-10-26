@@ -137,12 +137,18 @@ class High(State):
         return "H"
         
 class Low(State):
+    start_time = -1
+    delta_time = 0 
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
         logging.info("%s = Too low", location)
         GPIO.output(pin_valve, GPIO.HIGH)
         GPIO.output(pin_pump, GPIO.LOW)
         
-        return self.handleState(level_column, level_desired)
+        new_state = Pauze()
+        new_state.start_time = time.time()
+        new_state.delta_time = 1
+        
+        return new_state
 
     def getName(self):
         return "L"
