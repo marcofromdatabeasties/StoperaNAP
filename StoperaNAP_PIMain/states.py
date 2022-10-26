@@ -51,10 +51,7 @@ class State:
             else:
                 if (level_column_max > level_desired_max):
                     new_state = High()
-
-                    self.start_time = time.time()
-                    #self.delta_time = min(3, abs(level_desired_min * 100 - level_column_min * 100)) 
-                    self.delta_time = 4
+                    
         return new_state
     
     def restTime5sec(self):
