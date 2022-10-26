@@ -59,9 +59,9 @@ class State:
                         self.delta_time = min(3, abs(level_desired_min * 100 - level_column_min * 100)) 
         return new_state
     
-    def resetTime(self):
-        self.start_time = -1
-        self.delta_time = 0         
+    def restTime5sec(self):
+        self.start_time = time.time()
+        self.delta_time = 5        
         
 
 class NoWhere(State):
@@ -106,7 +106,7 @@ class Off(State):
             GPIO.output(pin_valve, GPIO.HIGH)
             GPIO.output(pin_pump, GPIO.HIGH)
             
-            self.resetTime()
+            
             
             return self.handleState(level_column, level_desired) 
        
