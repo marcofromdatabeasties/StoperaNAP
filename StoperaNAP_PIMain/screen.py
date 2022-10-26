@@ -40,6 +40,7 @@ class LCD:
             self.lcd.write_string(text)
             self.ms = time.time()
             self.lastRow = screenRow
+            self.times += 1
         
         if self.times % 33 == 0:
             self.clear()
