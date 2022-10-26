@@ -93,7 +93,7 @@ class Off(State):
         GPIO.output(pin_valve, GPIO.HIGH)
         GPIO.output(pin_pump, GPIO.HIGH)
         
-        if self.start_time + self.delta_time > time.time():
+        if self.start_time + self.delta_time < time.time():
             return self.handleState(level_column, level_desired)
         
         return self
@@ -109,7 +109,7 @@ class Pauze(State):
         logging.info("%s = pauze", location)
         
         new_state = self
-        if self.start_time + self.delta_time > time.time():
+        if self.start_time + self.delta_time < time.time():
             new_state = Off()
             new_state.start_time = time.time()
             new_state.delta_time = 10  

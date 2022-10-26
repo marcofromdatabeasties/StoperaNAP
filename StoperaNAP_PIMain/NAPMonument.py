@@ -44,6 +44,7 @@ class NAPMonument:
         GPIO.setup(constants.BTN_NAP, GPIO.IN, GPIO.PUD_UP) 
         
         self.screen = LCD()
+        self.screen.clear()
         self.pressureSensor = PressureSensor()
         self.rws = RWS()
        
