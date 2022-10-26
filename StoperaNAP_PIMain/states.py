@@ -24,9 +24,6 @@ import constants
 import time 
 
 class State:
-   
-    start_time = -1
-    delta_time = 0
     
     def handleState(self, level_column, level_desired):
         
@@ -49,18 +46,6 @@ class State:
                     new_state = High()
                     
         return new_state
-    
-    def restTime5sec(self):
-        self.start_time = time.time()
-        self.delta_time = 5  
-        
-    def restTime3sec(self):
-        self.start_time = time.time()
-        self.delta_time = 3  
-        
-    def restTime10sec(self):
-        self.start_time = time.time()
-        self.delta_time = 10        
         
 
 class NoWhere(State):
@@ -100,31 +85,37 @@ class Good(State):
         return "G"
     
 class Off(State):
-        def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
-            logging.info("%s = off", location)
-            GPIO.output(pin_valve, GPIO.HIGH)
-            GPIO.output(pin_pump, GPIO.HIGH)
-            
-            if self.start_time + self.delta_time > time.time():
-                return self.handleState(level_column, level_desired)
-            
-            return self
-       
-        def getName(self):
-            return "R"
+    start_time = -1
+    delta_time = 0
+    
+    def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
+        logging.info("%s = off", location)
+        GPIO.output(pin_valve, GPIO.HIGH)
+        GPIO.output(pin_pump, GPIO.HIGH)
+        
+        if self.start_time + self.delta_time > time.time():
+            return self.handleState(level_column, level_desired)
+        
+        return self
+   
+    def getName(self):
+        return "R"
     
 class Pauze(State):
+    start_time = -1
+    delta_time = 0 
+    
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
         logging.info("%s = pauze", location)
         
         new_state = self
         if self.start_time + self.delta_time > time.time():
-            self.restTime10sec()
             new_state = Off()
-        
+            new_state.start_time = time.time()
+            new_state.delta_time = 10  
         
         return new_state
-   
+       
     def getName(self):
         return "P"        
     
@@ -134,10 +125,13 @@ class High(State):
         logging.info("%s = Too high ", location)
         GPIO.output(pin_valve, GPIO.LOW)
         GPIO.output(pin_pump, GPIO.HIGH)
+       
         
-        self.restTime3sec()
+        new_state = Pauze()
+        new_state.start_time = time.time()
+        new_state.delta_time = 3
         
-        return Pauze()
+        return new_state
     
     def getName(self):
         return "H"
