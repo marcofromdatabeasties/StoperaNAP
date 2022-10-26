@@ -146,7 +146,7 @@ class Low(State):
         
         new_state = Pauze()
         new_state.start_time = time.time()
-        new_state.delta_time = min(10, ((level_column*100) - (level_desired*100)))
+        new_state.delta_time = min(10, abs((level_column*100) - (level_desired*100)))
         
         return new_state
 
