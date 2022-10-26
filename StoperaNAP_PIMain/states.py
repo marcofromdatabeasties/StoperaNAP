@@ -41,13 +41,9 @@ class State:
         
         if (level_column_min <= level_desired <= level_column_max ):
             new_state = Good()
-            self.start_time = -1
-            self.delta_time = 0
         else:
             if (level_column_min < level_desired_min):
                 new_state = Low()
-                self.start_time = -1
-                self.delta_time = 0                    
             else:
                 if (level_column_max > level_desired_max):
                     new_state = High()
@@ -56,7 +52,11 @@ class State:
     
     def restTime5sec(self):
         self.start_time = time.time()
-        self.delta_time = 5        
+        self.delta_time = 5  
+        
+    def restTime3sec(self):
+        self.start_time = time.time()
+        self.delta_time = 3  
         
     def restTime10sec(self):
         self.start_time = time.time()
@@ -135,7 +135,7 @@ class High(State):
         GPIO.output(pin_valve, GPIO.LOW)
         GPIO.output(pin_pump, GPIO.HIGH)
         
-        self.restTime5sec()
+        self.restTime3sec()
         
         return Pauze()
     
