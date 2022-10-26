@@ -28,7 +28,7 @@ class State:
     start_time = -1
     delta_time = 0
     
-    def handleState(self, level_column, level_desired):
+    def handleState(self, level_column, level_desired, next_state = None):
         
         level_desired_min = level_desired - abs(level_desired * constants.ACCURACY_OF_COLUMN)
         level_desired_max = level_desired + abs(level_desired * constants.ACCURACY_OF_COLUMN)
@@ -42,26 +42,35 @@ class State:
             new_state = Pauze()
         else:
             #no pause
-            if (level_column_min <= level_desired <= level_column_max ):
-                new_state = Good()
-                self.start_time = -1
-                self.delta_time = 0
-            else:
-                if (level_column_min < level_desired_min):
-                    new_state = Low()
+            if next_state != None:
+                new_state = next_state
+            else:    
+                
+                if (level_column_min <= level_desired <= level_column_max ):
+                    new_state = Good()
                     self.start_time = -1
-                    self.delta_time = 0                    
+                    self.delta_time = 0
                 else:
-                    if (level_column_max > level_desired_max):
-                        new_state = High()
-
-                        self.start_time = time.time()
-                        self.delta_time = min(3, abs(level_desired_min * 100 - level_column_min * 100)) 
+                    if (level_column_min < level_desired_min):
+                        new_state = Low()
+                        self.start_time = -1
+                        self.delta_time = 0                    
+                    else:
+                        if (level_column_max > level_desired_max):
+                            new_state = High()
+    
+                            self.start_time = time.time()
+                            #self.delta_time = min(3, abs(level_desired_min * 100 - level_column_min * 100)) 
+                            self.delta_time = 4
         return new_state
     
     def restTime5sec(self):
         self.start_time = time.time()
         self.delta_time = 5        
+        
+    def restTime10sec(self):
+        self.start_time = time.time()
+        self.delta_time = 10        
         
 
 class NoWhere(State):
@@ -106,7 +115,7 @@ class Off(State):
             GPIO.output(pin_valve, GPIO.HIGH)
             GPIO.output(pin_pump, GPIO.HIGH)
             
-            
+            self.restTime10sec()
             
             return self.handleState(level_column, level_desired) 
        
@@ -117,7 +126,7 @@ class Pauze(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
         logging.info("%s = pauze", location)
         
-        return Off()
+        return self.handleState(level_column, level_desired, Off()) 
    
     def getName(self):
         return "P"        
