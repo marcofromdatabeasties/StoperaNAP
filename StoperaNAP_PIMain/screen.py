@@ -20,7 +20,7 @@ class LCD:
     
     def __init__(self):
         self.lcd.cursor_pos = (3, 0)
-        self.lcd.write_string("V3.0 St. NAP/RWS")
+        self.lcd.write_string("V3.1 St. NAP/RWS/Stopera"[:19])
         self.ms = time.time()*1000.0
         self.lastRow = -1
 
@@ -29,7 +29,7 @@ class LCD:
         #timing to reduce screen update problems.
         if (self.ms + 1000 < time.time()*1000.0) and self.lastRow != screenRow:
         
-            text = ("{location} {status}{current_level:0.2f}/{desired_level:0.2f}" + (' ' * 20)).format(
+            text = ("{location} {status}{current_level:0.2f}/{desired_level:0.2f}" + (' ' * 19)).format(
                     location = location, status = status, 
                     current_level=current_level , desired_level = desired_level)
             text = text[:19]
@@ -47,7 +47,7 @@ class LCD:
     def clear(self):
         for i in [0,1,2]:
             self.lcd.cursor_pos = (i, 0)
-            self.lcd.write_string(' ' * 20)
+            self.lcd.write_string(' ' * 19)
         
         
         
