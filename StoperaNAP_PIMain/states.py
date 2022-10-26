@@ -38,7 +38,7 @@ class State:
 
         new_state = Start()
         
-        if self.start_time + self.delta_time <= time():
+        if self.start_time + self.delta_time <= time.time():
             new_state = Pauze()
         else:
             #no pause
@@ -47,7 +47,7 @@ class State:
             else:
                 if (level_column_min < level_desired_min):
                     new_state = Low()
-                    self.start_time = time()
+                    self.start_time = time.time()
                     self.delta_time = min(3, abs(level_desired_min * 100 - level_column_min * 100)) 
                 else:
                     if (level_column_max > level_desired_max):
