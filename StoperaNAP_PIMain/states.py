@@ -112,7 +112,7 @@ class Pauze(State):
         if self.start_time + self.delta_time < time.time():
             new_state = Off()
             new_state.start_time = time.time()
-            new_state.delta_time = 10  
+            new_state.delta_time = 20  
         
         return new_state
        
@@ -129,7 +129,7 @@ class High(State):
         
         new_state = Pauze()
         new_state.start_time = time.time()
-        new_state.delta_time = 3
+        new_state.delta_time = max(1, min(10, abs((level_column*100) - (level_desired*100))*3))
         
         return new_state
     
@@ -146,7 +146,7 @@ class Low(State):
         
         new_state = Pauze()
         new_state.start_time = time.time()
-        new_state.delta_time = min(10, abs((level_column*100) - (level_desired*100)))
+        new_state.delta_time = max(1,min(10, abs((level_column*100) - (level_desired*100))))
         
         return new_state
 

@@ -23,6 +23,7 @@ class LCD:
         self.lcd.write_string("V3.1 St. NAP/RWS/Stopera"[:18])
         self.ms = time.time()
         self.lastRow = -1
+        self.times = 0
 
     def writeToScreen(self, location, status, current_level , desired_level, screenRow):
         
@@ -39,6 +40,9 @@ class LCD:
             self.lcd.write_string(text)
             self.ms = time.time()
             self.lastRow = screenRow
+        
+        if self.times % 33 == 0:
+            self.clear()
     
         
     def writeInfoToScreen(self, message):
