@@ -22,7 +22,7 @@ RWS_URL="https://www.rijkswaterstaat.nl/rws/opendata/meetdata/meetdata.zip"
 COLUMN_1_LOCATION="IJMH"
 COLUMN_2_LOCATION="RPBU"
 BUTTONS_ACTIVE=True #use the buttons or not
-ACCURACY_OF_COLUMN=0.05 #% of accuracy
+ACCURACY_OF_COLUMN=0.02 #% of accuracy
 NO_WEEKEND = True #run on weekend (False) or not
 
 #screen
