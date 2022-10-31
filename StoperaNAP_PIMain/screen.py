@@ -24,6 +24,7 @@ class LCD:
         self.ms = time.time()
         self.lastRow = -1
         self.times = 0
+        self.lcd.cursor_mode = 'hide'
 
     def writeToScreen(self, location, status, current_level , desired_level, screenRow):
         
@@ -53,7 +54,7 @@ class LCD:
     def clear(self):
         for i in [0,1,2,3]:
             self.lcd.cursor_pos = (i, 0)
-            self.lcd.write_string(' ' * 20)
+            self.lcd.write_string(' ' * 19)
         self.lcd.cursor_pos = (3, 0)
         self.lcd.write_string("V3.1 NAP/RWS/Stopera"[:18])
         
