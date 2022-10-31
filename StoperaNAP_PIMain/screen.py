@@ -14,7 +14,7 @@ class LCD:
     
     lcd = CharLCD(i2c_expander='PCF8574', address=0x27, port=1,
               cols=20, rows=4, dotsize=8,
-              charmap='A02',
+              charmap='A00',
               auto_linebreaks=False,
               backlight_enabled=True)
     
@@ -25,6 +25,7 @@ class LCD:
         self.lastRow = -1
         self.times = 0
         self.lcd.cursor_mode = 'hide'
+        self.lcd.noAutoscroll()
 
     def writeToScreen(self, location, status, current_level , desired_level, screenRow):
         

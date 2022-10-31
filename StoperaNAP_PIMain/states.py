@@ -79,7 +79,13 @@ class Good(State):
         logging.info("%s = Level good ", location)
         GPIO.output(pin_valve, GPIO.HIGH)
         GPIO.output(pin_pump, GPIO.HIGH)
-        return self.handleState(level_column, level_desired) 
+        
+        new_state = Off()
+        new_state.start_time = time.time()
+        new_state.delta_time = 60 
+    
+        return new_state
+        #return self.handleState(level_column, level_desired) 
    
     def getName(self):
         return "G"
@@ -112,7 +118,7 @@ class Pauze(State):
         if self.start_time + self.delta_time < time.time():
             new_state = Off()
             new_state.start_time = time.time()
-            new_state.delta_time = 30  
+            new_state.delta_time = 35  
         
         return new_state
        
