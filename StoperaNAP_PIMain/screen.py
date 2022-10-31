@@ -51,9 +51,11 @@ class LCD:
         self.lcd.write_string((("{message}" + (' ' * 19)).format(message = message[:18])[:18]))
         
     def clear(self):
-        for i in [0,1,2]:
+        for i in [0,1,2,3]:
             self.lcd.cursor_pos = (i, 0)
-            self.lcd.write_string(' ' * 19)
+            self.lcd.write_string(' ' * 20)
+        self.lcd.cursor_pos = (3, 0)
+        self.lcd.write_string("V3.1 St. NAP/RWS/Stopera"[:18])
         
         
         
