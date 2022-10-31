@@ -52,7 +52,7 @@ class LCD:
         self.lcd.write_string((("{message}" + (' ' * 19)).format(message = message[:18])[:18]))
         
     def clear(self):
-        self.led.clear()
+        self.lcd.clear()
         self.lcd.cursor_pos = (3, 0)
         self.lcd.write_string("NAP/RWS/Stopera"[:18])
         
