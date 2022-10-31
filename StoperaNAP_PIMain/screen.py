@@ -29,7 +29,7 @@ class LCD:
         
         #timing to reduce screen update problems.
         if (self.ms + 1 < time.time()) and self.lastRow != screenRow:
-            kolom_ind = location[0] 
+            kolom_ind = location[0:1] 
         
             text = ("{kolom_ind} {status} {current_level:0.2f}/{desired_level:0.2f}" + (' ' * 10)).format(
                     kolom_ind = kolom_ind, status = status, 

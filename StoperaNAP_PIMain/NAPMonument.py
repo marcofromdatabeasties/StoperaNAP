@@ -89,8 +89,8 @@ class NAPMonument:
         GPIO.cleanup()
         self.screen.clear()
         self.screen.writeInfoToScreen("Shutdown...")
-        os.system("sudo shutdown -h now")
-        time.sleep(5)
+        os.system("systemctl poweroff")
+        time.sleep(3)
         self.screen.writeInfoToScreen("Bye...")
             
     def setNAPToZeroOrNot(self):
