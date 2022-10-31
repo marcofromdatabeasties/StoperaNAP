@@ -25,7 +25,6 @@ class LCD:
         self.lastRow = -1
         self.times = 0
         self.lcd.cursor_mode = 'hide'
-        self.lcd.noAutoscroll()
 
     def writeToScreen(self, location, status, current_level , desired_level, screenRow):
         
