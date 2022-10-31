@@ -27,11 +27,11 @@ class State:
     
     def handleState(self, level_column, level_desired):
         
-        level_desired_min = level_desired - abs(level_desired * constants.ACCURACY_OF_COLUMN)
-        level_desired_max = level_desired + abs(level_desired * constants.ACCURACY_OF_COLUMN)
+        level_desired_min = level_desired - abs(constants.NAP_COLUMN_HEIGHT * constants.ACCURACY_OF_COLUMN)
+        level_desired_max = level_desired + abs(constants.NAP_COLUMN_HEIGHT * constants.ACCURACY_OF_COLUMN)
         
-        level_column_min = level_column - abs(level_column * constants.ACCURACY_OF_COLUMN)
-        level_column_max = level_column + abs(level_column * constants.ACCURACY_OF_COLUMN)
+        level_column_min = level_column - abs(constants.NAP_COLUMN_HEIGHT * constants.ACCURACY_OF_COLUMN)
+        level_column_max = level_column + abs(constants.NAP_COLUMN_HEIGHT * constants.ACCURACY_OF_COLUMN)
 
         new_state = Start()
     
