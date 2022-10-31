@@ -30,7 +30,7 @@ class LCD:
         
         #timing to reduce screen update problems.
         if (self.ms + 1 < time.time()) and self.lastRow != screenRow:
-            kolom_ind = location[0:1] 
+            kolom_ind = location[0:2] 
         
             text = ("{kolom_ind} {status} {current_level:0.2f}/{desired_level:0.2f}" + (' ' * 10)).format(
                     kolom_ind = kolom_ind, status = status, 
@@ -52,11 +52,9 @@ class LCD:
         self.lcd.write_string((("{message}" + (' ' * 19)).format(message = message[:18])[:18]))
         
     def clear(self):
-        for i in [0,1,2,3]:
-            self.lcd.cursor_pos = (i, 0)
-            self.lcd.write_string(' ' * 19)
+        self.led.clear()
         self.lcd.cursor_pos = (3, 0)
-        self.lcd.write_string("V3.1 NAP/RWS/Stopera"[:18])
+        self.lcd.write_string("NAP/RWS/Stopera"[:18])
         
         
         

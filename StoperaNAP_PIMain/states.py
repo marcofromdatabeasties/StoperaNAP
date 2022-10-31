@@ -112,7 +112,7 @@ class Pauze(State):
         if self.start_time + self.delta_time < time.time():
             new_state = Off()
             new_state.start_time = time.time()
-            new_state.delta_time = 20  
+            new_state.delta_time = 30  
         
         return new_state
        
