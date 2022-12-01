@@ -53,8 +53,8 @@ class LCD:
         
     def clear(self):
         self.lcd.clear()
-        self.lcd.cursor_pos = (3, 0)
-        self.lcd.write_string("NAP/RWS/Stopera"[:18])
+        #self.lcd.cursor_pos = (3, 0)
+        #self.lcd.write_string("NAP/RWS/Stopera"[:18])
         
         
         

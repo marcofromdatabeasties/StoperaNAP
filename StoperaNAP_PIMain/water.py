@@ -12,6 +12,8 @@ This file holds the water columns type
 import states
 from pressure import PressureSensor
 import constants
+from datetime import datetime
+from time import time
 
 class WaterColumn:
     state = states.NoWhere()
@@ -24,6 +26,8 @@ class WaterColumn:
     
     previous_level = 0
     previous_desired = 0
+    
+    start_time = time.time()
     
     
     def __init__(self, location, channel, pin_valve, pin_pump, pressureSensor, screen, rws, screenRow ):
@@ -47,11 +51,11 @@ class WaterColumn:
     
     def setLevelToZero(self):
         #only set when empty is false
-        self.zero = not self.empty
+        self.zero = True
     
     def setLevelToEmpty(self):
         #only set when zero  is false
-        self.empty = not self.zero
+        self.empty = True
         
     def setToNormal(self):
         self.zero = False
@@ -87,6 +91,11 @@ class WaterColumn:
         #print ("Level Desired Column {0:2.2f}".format(level_desired))
         self.screen.writeToScreen(self.measure_location, self.state.getName(), level_column 
                                   , level_desired, self.screenRow)
+        
+        if self.start_time + self.delta_time < time.time():
+        
+            date = datetime.datetime.fromtimestamp(self.rws.getLastUpdate())
+            self.screen.writeInfoToScreen(f"U: {date}" )
                 
                 
         

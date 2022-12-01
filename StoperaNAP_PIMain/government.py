@@ -9,8 +9,7 @@ Created on Wed Oct 20 16:19:43 2021
 import urllib.request
 import zipfile
 from io import BytesIO
-from datetime import timedelta
-from datetime import datetime
+from datetime import timedelta, datetime
 import constants
 import traceback
 import logging
@@ -25,6 +24,10 @@ class RWS:
     def isEmptying(self, hour, day):
         #monday is 0
         return ( not  7 <= hour <= 22) or (day in {5, 6} and constants.NO_WEEKEND)
+    
+    
+    def getLastUpdate(self):
+        return self.starttime
     
     
     def getWaterLevel(self, measure_location):
