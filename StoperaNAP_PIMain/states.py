@@ -17,7 +17,6 @@ NOWHERE = 5;//boot
 Remember LOW = on
 
 """
-import socket
 import logging
 import RPi.GPIO as GPIO
 import constants
@@ -51,6 +50,9 @@ class State:
 class NoWhere(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
         screen.writeInfoToScreen("Startup")
+        GPIO.output(pin_valve, GPIO.HIGH)
+        GPIO.output(pin_pump, GPIO.HIGH)
+        
         new_state = Pauze()
         new_state.start_time = time.time()
         new_state.delta_time = 60 * 5
