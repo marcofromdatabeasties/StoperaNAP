@@ -26,6 +26,7 @@ class WaterColumn:
     
     previous_level = 0
     previous_desired = 0
+    delta_time = 30
     
     start_time = time()
     
