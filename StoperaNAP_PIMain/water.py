@@ -93,10 +93,10 @@ class WaterColumn:
         self.screen.writeToScreen(self.measure_location, self.state.getName(), level_column 
                                   , level_desired, self.screenRow)
         
-        if self.start_time + self.delta_time < time():
+       # if self.start_time + self.delta_time < time():
         
-            date = datetime.fromtimestamp(self.rws.getLastUpdate())
-            self.screen.writeInfoToScreen(f"U: {date}" )
+       #     date = datetime.fromtimestamp(self.rws.getLastUpdate())
+       #     self.screen.writeInfoToScreen(f"U: {date}" )
                 
                 
         
