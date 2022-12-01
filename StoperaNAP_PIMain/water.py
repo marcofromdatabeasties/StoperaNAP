@@ -27,7 +27,7 @@ class WaterColumn:
     previous_level = 0
     previous_desired = 0
     
-    start_time = time.time()
+    start_time = time()
     
     
     def __init__(self, location, channel, pin_valve, pin_pump, pressureSensor, screen, rws, screenRow ):
@@ -92,7 +92,7 @@ class WaterColumn:
         self.screen.writeToScreen(self.measure_location, self.state.getName(), level_column 
                                   , level_desired, self.screenRow)
         
-        if self.start_time + self.delta_time < time.time():
+        if self.start_time + self.delta_time < time():
         
             date = datetime.datetime.fromtimestamp(self.rws.getLastUpdate())
             self.screen.writeInfoToScreen(f"U: {date}" )
