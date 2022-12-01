@@ -95,7 +95,7 @@ class WaterColumn:
         
         if self.start_time + self.delta_time < time():
         
-            date = datetime.datetime.fromtimestamp(self.rws.getLastUpdate())
+            date = datetime.fromtimestamp(self.rws.getLastUpdate())
             self.screen.writeInfoToScreen(f"U: {date}" )
                 
                 
