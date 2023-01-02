@@ -10,6 +10,7 @@ display the current water level at IJmuiden en Zierikzee and one displaying the
 level of the 1953 flood.
 """
 from water import WaterColumn
+import logging
 import time
 import RPi.GPIO as GPIO
 from screen import LCD
@@ -59,12 +60,15 @@ class NAPMonument:
         #self.Watersnood = WaterColumn1953("1953", 2, 20, 21)
 
 
-        while True:
-            self.buttonTesting()
-            self.IJmuiden.runWorlds()
-            time.sleep(constants.COLUMN_WAIT/2)
-            self.Vlissingen.runWorlds()
-            time.sleep(constants.COLUMN_WAIT/2)
+        try:
+            while True:
+                self.buttonTesting()
+                self.IJmuiden.runWorlds()
+                time.sleep(constants.COLUMN_WAIT/2)
+                self.Vlissingen.runWorlds()
+                time.sleep(constants.COLUMN_WAIT/2)
+        except Exception as e:
+           logging.error("%s", e) 
             
            
     #obsolete function in case of interrupt troubles on-site
@@ -89,7 +93,7 @@ class NAPMonument:
         GPIO.cleanup()
         self.screen.clear()
         self.screen.writeInfoToScreen("Shutdown...")
-        os.system("systemctl poweroff")
+        os.system("halt")
         time.sleep(3)
         self.screen.writeInfoToScreen("Bye...")
             
