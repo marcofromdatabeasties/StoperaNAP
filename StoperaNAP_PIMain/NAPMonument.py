@@ -61,16 +61,17 @@ class NAPMonument:
         #self.Watersnood = WaterColumn1953("1953", 2, 20, 21)
 
 
-        try:
-            while True:
+        
+        while True:
+            try:
                 self.buttonTesting()
                 self.IJmuiden.runWorlds()
                 time.sleep(constants.COLUMN_WAIT/2)
                 self.Vlissingen.runWorlds()
                 time.sleep(constants.COLUMN_WAIT/2)
-        except Exception as e:
-           logging.error("%s", e)
-           ET.phoneHome(str(e))
+            except Exception as e:
+                logging.error("%s", str(e))
+                ET.phoneHome(str(e))
            
             
            
