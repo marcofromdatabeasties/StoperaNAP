@@ -17,7 +17,8 @@ from screen import LCD
 import constants
 import os
 from pressure import PressureSensor
-from government import RWS 
+from government import RWS
+import ET
 
 class NAPMonument:
      
@@ -68,7 +69,9 @@ class NAPMonument:
                 self.Vlissingen.runWorlds()
                 time.sleep(constants.COLUMN_WAIT/2)
         except Exception as e:
-           logging.error("%s", e) 
+           logging.error("%s", e)
+           ET.phoneHome(str(e))
+           
             
            
     #obsolete function in case of interrupt troubles on-site
@@ -93,7 +96,7 @@ class NAPMonument:
         GPIO.cleanup()
         self.screen.clear()
         self.screen.writeInfoToScreen("Shutdown...")
-        os.system("halt")
+        os.system("systemctl poweroff")
         time.sleep(3)
         self.screen.writeInfoToScreen("Bye...")
             
