@@ -58,7 +58,9 @@ class NAPMonument:
         self.Vlissingen = WaterColumn(constants.COLUMN_2_LOCATION, constants.PR_VLISSINGEN,
                                       constants.VL_VLISSINGEN,constants.PUMP_VLISSINGEN
                                       , self.pressureSensor, self.screen, self.rws, 1)
-        #self.Watersnood = WaterColumn1953("1953", 2, 20, 21)
+        self.Watersnood = WaterColumn1953(constants.COLUMN_3_LOCATION, constants.PR_53,
+                                      constants.VL_53,constants.PUMP_53
+                                      , self.pressureSensor, self.screen, self.rws, 3)
 
 
         
@@ -66,9 +68,11 @@ class NAPMonument:
             try:
                 self.buttonTesting()
                 self.IJmuiden.runWorlds()
-                time.sleep(constants.COLUMN_WAIT/2)
+                time.sleep(constants.COLUMN_WAIT)
                 self.Vlissingen.runWorlds()
-                time.sleep(constants.COLUMN_WAIT/2)
+                time.sleep(constants.COLUMN_WAIT)
+                self.Watersnood.runWorlds()
+                time.sleep(constants.COLUMN_WAIT)
             except Exception as e:
                 logging.error("%s", str(e))
                 ET.phoneHome(str(e))
@@ -97,7 +101,7 @@ class NAPMonument:
         GPIO.cleanup()
         self.screen.clear()
         self.screen.writeInfoToScreen("Shutdown...")
-        os.system("systemctl poweroff")
+        os.system("systemctl poweroff -i")
         time.sleep(3)
         self.screen.writeInfoToScreen("Bye...")
             

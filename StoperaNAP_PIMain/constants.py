@@ -18,11 +18,12 @@ NAP_COLUMN_MAX_LEVEL = {
 TEN_S_EQUAL_ERROR_COUNT = 50 #times level stays the same
 #with a column width of 50cm and a pump of 120Lt/min, a centimeter column is 0,31 ltr so a reaction time of 2g = 159 ms. 
 #COLUMN_WAIT = 0.079
-COLUMN_WAIT = 0.3
-CYCLE_TIME_1953=15
-RWS_URL="https://www.rijkswaterstaat.nl/rws/opendata/meetdata/meetdata.zip"
+COLUMN_WAIT = 0.15
+HALF_CYCLE_TIME_1953=7
+LEVEL_1953 = 455
 COLUMN_1_LOCATION="IJMH"
 COLUMN_2_LOCATION="RPBU"
+COLUMN_3_LOCATION="1953"
 BUTTONS_ACTIVE=True #use the buttons or not
 ACCURACY_OF_COLUMN=0.015 #% of accuracy
 NO_WEEKEND = True #run on weekend (False) or not
@@ -47,9 +48,9 @@ BTN_SHUTDOWN = 13
 BTN_NAP = 19
 BTN_EMPTY = 26
 
-#PR_VLISSINGEN = ADS.P1
-#PR_IJMUIDEN = ADS.P2
-#PR_53 = ADS.P3
+PR_VLISSINGEN = ADS.P1
+PR_IJMUIDEN = ADS.P2
+PR_53 = ADS.P3
 
 NAPLogger = "https://maker.ifttt.com/trigger/NAPLogger/json/with/key/" + secret.key
 
