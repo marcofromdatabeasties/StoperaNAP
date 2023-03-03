@@ -77,21 +77,21 @@ class NAPMonument:
             except Exception as e:
                 logging.error("%s", self.IJmuiden.measure_location + str(e))
                 ET.phoneHome("%s" % self.IJmuiden.measure_location + str(e))
-                print_exc(file=sys.stdout)
+                traceback.print_exc(file=sys.stdout)
             try:
                 self.Vlissingen.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
             except Exception as e:
                 logging.error("%s", self.Vlissingen.measure_location + str(e))
-                ET.phoneHome("%s" %self.IJmuidenden.measure_location + str(e))
-                print_exc(file=sys.stdout)
+                ET.phoneHome("%s" % self.IJmuidenden.measure_location + str(e))
+                traceback.print_exc(file=sys.stdout)
             try:    
                 self.Watersnood.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
             except Exception as e:
                 logging.error("%s", self.Watersnood +  str(e))
-                ET.phoneHome("%s" %self.IJmuidenden.measure_location + str(e))
-                print_exc(file=sys.stdout)
+                ET.phoneHome("%s" % self.IJmuidenden.measure_location + str(e))
+                traceback.print_exc(file=sys.stdout)
            
             
            
