@@ -56,48 +56,44 @@ class RWS:
                 not measure_location in self.result.keys()):
             
             self.result[measure_location] = constants.NAP_COLUMN_LEVEL
+            
+            loc = self.getLocation(measure_location);
+            if loc != False:
         
-            data = {"AquoPlusWaarnemingMetadataLijst" :[{"AquoMetadata":{"Compartiment": 
-                        {"Code":"OW"},"Eenheid":{"Code":"cm"},
-                        "Hoedanigheid":{"Code":"NAP"}}}],
-                        "LocatieLijst":[self.getLocation(measure_location)]}
-            
-           
-            req = urllib.request.Request(constants.WaterData['RetrieveObservation'])
-            req.add_header('Content-Type', 'application/json')
-            
-            jsondata = json.dumps(data)
-            jsondataasbytes = jsondata.encode('utf-8')   # needs to be bytes
-            req.add_header('Content-Length', len(jsondataasbytes))
-    
-            response = urllib.request.urlopen(req, jsondataasbytes)
-            body = response.read()
-            if (response.status == 200):
-                doc = json.loads(body.decode("utf-8"))
-                observations = doc['WaarnemingenLijst'][0]
-                measurements = observations['MetingenLijst'][0]
-                self.catalogus_time = datetime.now() + self.minutes_10
-                measurement = measurements['Meetwaarde']
-                value = measurement['Waarde_Numeriek']
-                self.result[measure_location] = value
-                ET.phoneHome("OK, retrieved new waterlevel")
-                return value
-            else:
-                if self.getCatalogus():
-                    ET.phoneHome("OK, retrieved new catalogus")
+                data = {"AquoPlusWaarnemingMetadataLijst" :[{"AquoMetadata":{"Compartiment": 
+                            {"Code":"OW"},"Eenheid":{"Code":"cm"},
+                            "Hoedanigheid":{"Code":"NAP"}}}],
+                            "LocatieLijst":[loc]}
+                
+               
+                req = urllib.request.Request(constants.WaterData['RetrieveObservation'])
+                req.add_header('Content-Type', 'application/json')
+                
+                jsondata = json.dumps(data)
+                jsondataasbytes = jsondata.encode('utf-8')   # needs to be bytes
+                req.add_header('Content-Length', len(jsondataasbytes))
+        
+                response = urllib.request.urlopen(req, jsondataasbytes)
+                body = response.read()
+                if (response.status == 200):
+                    doc = json.loads(body.decode("utf-8"))
+                    observations = doc['WaarnemingenLijst'][0]
+                    measurements = observations['MetingenLijst'][0]
+                    self.catalogus_time = datetime.now() + self.minutes_10
+                    measurement = measurements['Meetwaarde']
+                    value = measurement['Waarde_Numeriek']
+                    self.result[measure_location] = value
+                    ET.phoneHome("OK, retrieved new waterlevel")
+                    return value
 
         return self.result[measure_location]
         
     
     def getLocation(self, code):
-        datetime.now().time();
-        if (len(self.catalogus) == 0 or datetime.now().time().hour == 0):
-            if self.getCatalogus():
-                ET.phoneHome("OK, retrieved new catalogus")
-            
-        for location in self.catalogus:
-            if location["Code"] == code:
-                return location
+        if rws.getCatalogus():            
+            for location in self.catalogus:
+                if location["Code"] == code:
+                    return location
         return False
         
 if __name__ == "__main__":
