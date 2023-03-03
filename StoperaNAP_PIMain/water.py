@@ -100,12 +100,12 @@ class WaterColumn:
                 
                 
 class WaterColumn1953 (WaterColumn):
-    start_time = time.time()
+    start_time = time()
     
     def getWaterLevel(self):
-        if self.start_time + (constants.HALF_CYCLE_TIME_1953 * 2) < time.time():
-                self.start_time = time.time()
-        if self.start_time + constants.HALF_CYCLE_TIME_1953 < time.time():
+        if self.start_time + (constants.HALF_CYCLE_TIME_1953 * 2) < time():
+                self.start_time = time()
+        if self.start_time + constants.HALF_CYCLE_TIME_1953 < time():
             return 0, True
         else:
             return constants.LEVEL_1953, True

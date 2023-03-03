@@ -13,7 +13,7 @@ import secret
 NAP_COLUMN_LEVEL = -2.06 #neters to NAP
 NAP_COLUMN_HEIGHT = 6.06 #max column height
 NAP_COLUMN_MAX_LEVEL = {
-    "IJMH": 3.5, "RPBU": 4.0  #max_level
+    "IJMH": 3.5, "RPBU": 4.0, "1953": 4.6  #max_level
 }
 TEN_S_EQUAL_ERROR_COUNT = 50 #times level stays the same
 #with a column width of 50cm and a pump of 120Lt/min, a centimeter column is 0,31 ltr so a reaction time of 2g = 159 ms. 
