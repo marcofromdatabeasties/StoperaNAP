@@ -46,7 +46,9 @@ class NAPMonument:
         GPIO.setup(constants.BTN_NAP, GPIO.IN, GPIO.PUD_UP) 
         
         self.screen = LCD()
+        time.sleep(1)
         self.screen.clear()
+        self.screen.writeInfoToScreen("Hello!")
         self.pressureSensor = PressureSensor()
         self.rws = RWS()
        
@@ -58,9 +60,10 @@ class NAPMonument:
         self.Vlissingen = WaterColumn(constants.COLUMN_2_LOCATION, constants.PR_VLISSINGEN,
                                       constants.VL_VLISSINGEN,constants.PUMP_VLISSINGEN
                                       , self.pressureSensor, self.screen, self.rws, 1)
+        
         self.Watersnood = WaterColumn1953(constants.COLUMN_3_LOCATION, constants.PR_53,
                                       constants.VL_53,constants.PUMP_53
-                                      , self.pressureSensor, self.screen, self.rws, 3)
+                                      , self.pressureSensor, self.screen, self.rws, 2)
 
 
         
@@ -69,13 +72,24 @@ class NAPMonument:
                 self.buttonTesting()
                 self.IJmuiden.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
+            except Exception as e:
+                logging.error("%s", self.IJmuidenden.measure_location + str(e))
+                ET.phoneHome(str(e))
+                traceback.print_exc(file=sys.stdout)
+            try:
                 self.Vlissingen.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
+            except Exception as e:
+                logging.error("%s", self.Vlissingen.measure_location + str(e))
+                ET.phoneHome(str(e))
+                traceback.print_exc(file=sys.stdout)
+            try:    
                 self.Watersnood.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
             except Exception as e:
-                logging.error("%s", str(e))
+                logging.error("%s", self.Watersnood +  str(e))
                 ET.phoneHome(str(e))
+                traceback.print_exc(file=sys.stdout)
            
             
            
