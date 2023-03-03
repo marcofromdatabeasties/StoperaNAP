@@ -49,12 +49,13 @@ class NAPMonument:
         self.screen = LCD()
         time.sleep(1)
         self.screen.clear()
-        self.screen.writeInfoToScreen("Hello!")
+        self.screen.writeInfoToScreen("Hello! wait 5m")
         self.pressureSensor = PressureSensor()
         self.rws = RWS()
         ET.phoneHome("Wake up")
        
     def start(self):
+        self.screen.writeInfoToScreen("Go")
         time.sleep(60*5) #sleep 5 minutes
         self.IJmuiden = WaterColumn(constants.COLUMN_1_LOCATION, constants.PR_IJMUIDEN
                                     , constants.VL_IJMUIDEN, constants.PUMP_IJMUIDEN
