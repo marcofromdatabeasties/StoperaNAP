@@ -9,7 +9,7 @@ Main class that symbolizes the monument, containing three cylinders two of which
 display the current water level at IJmuiden en Zierikzee and one displaying the
 level of the 1953 flood.
 """
-from water import WaterColumn
+from water import WaterColumn, WaterColumn1953
 import logging
 import time
 import RPi.GPIO as GPIO
