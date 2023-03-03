@@ -55,6 +55,7 @@ class NAPMonument:
         ET.phoneHome("Wake up")
        
     def start(self):
+        time.sleep(60*5) #sleep 5 minutes
         self.IJmuiden = WaterColumn(constants.COLUMN_1_LOCATION, constants.PR_IJMUIDEN
                                     , constants.VL_IJMUIDEN, constants.PUMP_IJMUIDEN
                                     , self.pressureSensor, self.screen, self.rws, 0) 
