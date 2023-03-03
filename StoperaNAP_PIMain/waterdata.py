@@ -82,10 +82,19 @@ class RWS:
                 self.result[measure_location] = value
                 ET.phoneHome("OK, retrieved new waterlevel")
                 return value
+            else:
+                if self.getCatalogus():
+                    ET.phoneHome("OK, retrieved new catalogus")
+
         return self.result[measure_location]
         
     
     def getLocation(self, code):
+        datetime.now().time();
+        if (len(self.catalogus) == 0 or datetime.now().time().hour == 0):
+            if self.getCatalogus():
+                ET.phoneHome("OK, retrieved new catalogus")
+            
         for location in self.catalogus:
             if location["Code"] == code:
                 return location
