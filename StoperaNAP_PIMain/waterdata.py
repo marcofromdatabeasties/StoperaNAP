@@ -90,7 +90,7 @@ class RWS:
         
     
     def getLocation(self, code):
-        if rws.getCatalogus():            
+        if self.getCatalogus():            
             for location in self.catalogus:
                 if location["Code"] == code:
                     return location
