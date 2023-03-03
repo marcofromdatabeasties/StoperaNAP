@@ -10,7 +10,7 @@ Created on Sun Oct 24 20:47:15 2021
 
 import secret
 
-NAP_COLUMN_LEVEL = -2.06 #neters to NAP
+NAP_COLUMN_LEVEL = -2.06 #meters to NAP
 NAP_COLUMN_HEIGHT = 6.06 #max column height
 NAP_COLUMN_MAX_LEVEL = {
     "IJMH": 3.5, "RPBU": 4.0, "1953": 4.6  #max_level

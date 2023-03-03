@@ -45,9 +45,9 @@ class WaterColumn:
         
     def getWaterLevel(self):
         if (self.zero):
-            return 0, True
+            return 0
         if (self.empty):
-            return constants.NAP_COLUMN_LEVEL, True
+            return constants.NAP_COLUMN_LEVEL
         return self.rws.getWaterLevel(self.measure_location)
     
     def setLevelToZero(self):
@@ -66,20 +66,10 @@ class WaterColumn:
         #NAP start  + NAP level equals column height 
         level_column = constants.NAP_COLUMN_LEVEL + self.pressureSensor.getColumnLevel(self.channel)
             
-        level_desired, ok = self.getWaterLevel() 
+        level_desired = self.getWaterLevel() 
         
-        if (ok):
-            self.previous_desired = level_desired
-        else:
-            #print("error")
-            
-            level_desired = self.previous_desired
-        
-        if (ok):
-            self.state = self.state.execute(self.measure_location, level_column, level_desired,  self.pin_valve, self.pin_pump, self.screen)
-        else:
-            self.state = states.Error()
-        
+        self.state = self.state.execute(self.measure_location, level_column, level_desired,  self.pin_valve, self.pin_pump, self.screen)
+                
         #check if an hardware error is occuring
         if (self.previous_level == level_column and level_desired > level_column):
             self.counter += 1
@@ -106,9 +96,9 @@ class WaterColumn1953 (WaterColumn):
         if self.start_time + (constants.HALF_CYCLE_TIME_1953 * 2) < time():
                 self.start_time = time()
         if self.start_time + constants.HALF_CYCLE_TIME_1953 < time():
-            return 0, True
+            return 0.0
         else:
-            return constants.LEVEL_1953, True
+            return constants.LEVEL_1953
             
             
         

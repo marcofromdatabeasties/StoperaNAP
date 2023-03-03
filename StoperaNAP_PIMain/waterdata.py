@@ -84,7 +84,7 @@ class RWS:
                     value = measurement['Waarde_Numeriek']
                     self.result[measure_location] = value / 100 # to meters
                     ET.phoneHome("OK, retrieved new waterlevel")
-                    return value, True
+                    return value
 
         return self.result[measure_location]
         
