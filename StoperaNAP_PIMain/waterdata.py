@@ -81,8 +81,8 @@ class RWS:
                     measurements = observations['MetingenLijst'][0]
                     self.catalogus_time = datetime.now() + self.minutes_10
                     measurement = measurements['Meetwaarde']
-                    value = measurement['Waarde_Numeriek']
-                    self.result[measure_location] = value / 100 # to meters
+                    value = measurement['Waarde_Numeriek'] / 100 # to meters
+                    self.result[measure_location] = value 
                     ET.phoneHome("OK, retrieved new waterlevel")
                     return value
 
