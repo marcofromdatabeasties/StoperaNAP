@@ -55,7 +55,7 @@ class NoWhere(State):
         
         new_state = Pauze()
         new_state.start_time = time.time()
-        new_state.delta_time = 60 * 5
+        new_state.delta_time = 5
         return new_state
 
     def getName(self):
