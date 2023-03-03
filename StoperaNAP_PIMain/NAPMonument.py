@@ -51,6 +51,7 @@ class NAPMonument:
         self.screen.writeInfoToScreen("Hello!")
         self.pressureSensor = PressureSensor()
         self.rws = RWS()
+        ET.phoneHome("Wake up")
        
     def start(self):
         self.IJmuiden = WaterColumn(constants.COLUMN_1_LOCATION, constants.PR_IJMUIDEN
@@ -74,21 +75,21 @@ class NAPMonument:
                 time.sleep(constants.COLUMN_WAIT)
             except Exception as e:
                 logging.error("%s", self.IJmuidenden.measure_location + str(e))
-                ET.phoneHome(str(e))
+                ET.phoneHome("%s", self.IJmuidenden.measure_location + str(e))
                 traceback.print_exc(file=sys.stdout)
             try:
                 self.Vlissingen.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
             except Exception as e:
                 logging.error("%s", self.Vlissingen.measure_location + str(e))
-                ET.phoneHome(str(e))
+                ET.phoneHome("%s", self.IJmuidenden.measure_location + str(e))
                 traceback.print_exc(file=sys.stdout)
             try:    
                 self.Watersnood.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
             except Exception as e:
                 logging.error("%s", self.Watersnood +  str(e))
-                ET.phoneHome(str(e))
+                ET.phoneHome("%s", self.IJmuidenden.measure_location + str(e))
                 traceback.print_exc(file=sys.stdout)
            
             
