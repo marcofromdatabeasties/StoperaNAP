@@ -19,6 +19,7 @@ import os
 from pressure import PressureSensor
 from waterdata import RWS
 import ET
+import traceback
 
 class NAPMonument:
      
