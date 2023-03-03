@@ -70,30 +70,28 @@ class NAPMonument:
 
         
         while True:
-            #try:
+            try:
                 self.buttonTesting()
                 self.IJmuiden.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
-                """except Exception as e:
+            except Exception as e:
                     logging.error("%s", self.IJmuiden.measure_location + str(e))
                     ET.phoneHome("%s" % self.IJmuiden.measure_location + str(e))
                     traceback.print_stack()
-                try:"""
+            try:
                 self.Vlissingen.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
-                """except Exception as e:
+            except Exception as e:
                     logging.error("%s", self.Vlissingen.measure_location + str(e))
                     ET.phoneHome("%s" % self.Vlissingen.measure_location + str(e))
                     traceback.print_stack()
-                try:"""    
+            try:    
                 self.Watersnood.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
-                """except Exception as e:
+            except Exception as e:
                     logging.error("%s", self.Watersnood +  str(e))
                     ET.phoneHome("%s" % self.Watersnood.measure_location + str(e))
                     traceback.print_stack()
-                """
-            
            
     #obsolete function in case of interrupt troubles on-site
     def buttonTesting(self):
