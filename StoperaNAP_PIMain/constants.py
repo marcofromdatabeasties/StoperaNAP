@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#import adafruit_ads1x15.ads1015 as ADS
+import adafruit_ads1x15.ads1015 as ADS
 
 """
 Created on Sun Oct 24 20:47:15 2021
