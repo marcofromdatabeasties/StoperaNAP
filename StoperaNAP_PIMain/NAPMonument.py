@@ -83,14 +83,14 @@ class NAPMonument:
                 time.sleep(constants.COLUMN_WAIT)
             except Exception as e:
                 logging.error("%s", self.Vlissingen.measure_location + str(e))
-                ET.phoneHome("%s" % self.IJmuidenden.measure_location + str(e))
+                ET.phoneHome("%s" % self.Vlissingen.measure_location + str(e))
                 traceback.print_exc(file=sys.stdout)
             try:    
                 self.Watersnood.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
             except Exception as e:
                 logging.error("%s", self.Watersnood +  str(e))
-                ET.phoneHome("%s" % self.IJmuidenden.measure_location + str(e))
+                ET.phoneHome("%s" % self.Watersnood.measure_location + str(e))
                 traceback.print_exc(file=sys.stdout)
            
             
