@@ -22,8 +22,9 @@ import ET
 import sys, traceback
 
 class NAPMonument:
-     
-    def __init__(self):
+    
+    def buttonsUp(self):
+    
         GPIO.setmode(GPIO.BCM) 
         GPIO.setwarnings(True)
         GPIO.setup(constants.PUMP_IJMUIDEN, GPIO.OUT)
@@ -45,7 +46,9 @@ class NAPMonument:
         GPIO.setup(constants.BTN_SHUTDOWN, GPIO.IN, GPIO.PUD_UP)
         GPIO.setup(constants.BTN_EMPTY, GPIO.IN, GPIO.PUD_UP) 
         GPIO.setup(constants.BTN_NAP, GPIO.IN, GPIO.PUD_UP) 
-        
+    
+    def __init__(self):
+        self.buttonsUp()
         self.screen = LCD()
         time.sleep(1)
         self.screen.clear()
@@ -74,6 +77,7 @@ class NAPMonument:
         
         while True:
             try:
+                self.buttonsUp()
                 self.buttonTesting()
                 self.IJmuiden.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
@@ -98,6 +102,12 @@ class NAPMonument:
            
     #obsolete function in case of interrupt troubles on-site
     def buttonTesting(self):
+        GPIO.setmode(GPIO.BCM) 
+        GPIO.setwarnings(False)
+        GPIO.setup(constants.BTN_SHUTDOWN, GPIO.IN, GPIO.PUD_UP)
+        GPIO.setup(constants.BTN_EMPTY, GPIO.IN, GPIO.PUD_UP) 
+        GPIO.setup(constants.BTN_NAP, GPIO.IN, GPIO.PUD_UP)
+        
         if GPIO.input(constants.BTN_SHUTDOWN) == GPIO.LOW:
             self.shutdown_h_now()
         

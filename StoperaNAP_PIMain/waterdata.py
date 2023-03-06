@@ -11,6 +11,7 @@ from datetime import timedelta, datetime
 import constants
 import json
 import ET
+from numpy.core.defchararray import startswith
 
 class RWS:
     minutes_10 = timedelta(minutes=10)
@@ -22,7 +23,7 @@ class RWS:
     
     def isEmptying(self, hour, day):
         #monday is 0
-        return ( not  7 <= hour <= 22) or (day in {5, 6} and constants.NO_WEEKEND)
+        return ( not(7 <= hour <= 22)) or (day in {5, 6} and constants.NO_WEEKEND)
     
     
     def getLastUpdate(self):
@@ -52,8 +53,7 @@ class RWS:
         if self.isEmptying(hour, day):
             return constants.NAP_COLUMN_LEVEL
         
-        if (datetime.now() > self.catalogus_time or 
-                not measure_location in self.result.keys()):
+        if not measure_location in self.result.keys():
             
             self.result[measure_location] = constants.NAP_COLUMN_LEVEL
             
@@ -105,20 +105,24 @@ if __name__ == "__main__":
     #print (rws.getWaterLevel(constants.COLUMN_2_LOCATION))
     #print (rws.getWaterLevel(constants.COLUMN_1_LOCATION))
     
-    print ( rws.isEmptying(24, 0))
-    print ( rws.isEmptying(22, 0))
-    print ( rws.isEmptying(22, 5))
-    print ( rws.isEmptying(22, 6))
-    print ( rws.isEmptying(8, 0))
-    
-    print(rws.getCatalogus())
+    # print ( rws.isEmptying(24, 0))
+    # print ( rws.isEmptying(22, 0))
+    # print ( rws.isEmptying(22, 5))
+    # print ( rws.isEmptying(22, 6))
+    # print ( rws.isEmptying(8, 0))
+    rws.getCatalogus()
+    #print(rws.getCatalogus())
+    for location in rws.catalogus:
+                if location["Code"].startswith("IJM" ):
+                    print( location)
     #print(rws.catalogus)
     
     print(rws.getWaterLevel("IJMH"))
-    print(rws.getWaterLevel("IJMH"))
-    print(rws.getWaterLevel("IJMH"))
-    print(rws.getWaterLevel("RPBU"))
-    print(rws.getWaterLevel("RPBU"))
-    print(rws.getWaterLevel("RPBU"))
-    
+    # print(rws.getWaterLevel("IJMH"))
+    # print(rws.getWaterLevel("IJMH"))
+    # print(rws.getWaterLevel("RPBU"))
+    # print(rws.getWaterLevel("RPBU"))
+    # print(rws.getWaterLevel("RPBU"))
+    #
+
 
