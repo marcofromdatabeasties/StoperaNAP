@@ -20,8 +20,11 @@ from pressure import PressureSensor
 from waterdata import RWS
 import ET
 import sys, traceback
+from datetime import timedelta, datetime
+import urllib.request
 
 class NAPMonument:
+    starttime = datetime.now() - timedelta(hours=24)
     
     def buttonsUp(self):
     
@@ -77,9 +80,29 @@ class NAPMonument:
         
         while True:
             try:
+                if starttime + timedelta(hours=24) > datetime.now():
+                    starttime = datetime.now()
+                    req = urllib.request.Request(constants.IP_API)
+                    response = urllib.request.urlopen(req)
+                    body = response.read()
+                    if (response.status == 200):
+                        result = json.loads(body.decode("utf-8"))
+                        ip = result['ip']
+                        ET.phoneHome("remote ip: %s" % ip)
+                    else:
+                        starttime = datetime.now() + timedelta(hours=1)
+                    
+            except Exception as e:
+                starttime = datetime.now().time() + timedelta(hour=1)
+                logging.error("No ip", str(e))
+                ET.phoneHome("ip error: %s" % str(e))
+                traceback.print_stack()    
+            try:
                 self.buttonsUp()
                 self.buttonTesting()
                 self.IJmuiden.runWorlds()
+                
+                
                 time.sleep(constants.COLUMN_WAIT)
             except Exception as e:
                     logging.error("%s", self.IJmuiden.measure_location + str(e))

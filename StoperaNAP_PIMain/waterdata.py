@@ -47,7 +47,7 @@ class RWS:
         return False
     
     def getWaterLevel(self, measure_location):
-        currenttime = datetime.now().time();
+        currenttime = datetime.now().time()
         day = datetime.today().weekday()
         hour = currenttime.hour
         if self.isEmptying(hour, day):
