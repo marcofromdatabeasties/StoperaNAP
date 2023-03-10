@@ -12,7 +12,7 @@ This file holds the water columns type
 import states
 from pressure import PressureSensor
 import constants
-from datetime import datetime
+from datetime import timedelta, datetime
 from time import time
 
 class WaterColumn:
@@ -83,12 +83,13 @@ class WaterColumn:
      
                 
 class WaterColumn1953 (WaterColumn):
-    start_time = time()
+    
+    start_time = datetime.now()
     
     def getWaterLevel(self):
-        if self.start_time + (constants.HALF_CYCLE_TIME_1953 * 2) < time():
-                self.start_time = time()
-        if self.start_time + constants.HALF_CYCLE_TIME_1953 < time():
+        if self.start_time + timedelta(minutes=constants.HALF_CYCLE_TIME_1953 * 2) < datetime.now():
+                self.start_time = datetime.now()
+        if self.start_time + timedelta(minutes=constants.HALF_CYCLE_TIME_1953) < datetime.now():
             return 0.0
         else:
             return constants.LEVEL_1953
