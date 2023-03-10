@@ -51,10 +51,11 @@ class RWS:
         day = datetime.today().weekday()
         hour = currenttime.hour
         if self.isEmptying(hour, day):
+            self.catalogus_time = datetime.now() + self.minutes_10
             return constants.NAP_COLUMN_LEVEL
         
-        if not measure_location in self.result.keys():
-            
+        if (not measure_location in self.result.keys()) or (datetime.now() + self.minutes_10 > self.catalogus_time):
+            self.catalogus_time = datetime.now() + self.minutes_10
             self.result[measure_location] = constants.NAP_COLUMN_LEVEL
             
             loc = self.getLocation(measure_location);
