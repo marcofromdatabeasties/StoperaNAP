@@ -11,7 +11,7 @@ from datetime import timedelta, datetime
 import constants
 import json
 import ET
-from numpy.core.defchararray import startswith
+#from numpy.core.defchararray import startswith
 
 class RWS:
     minutes_10 = timedelta(minutes=10)
