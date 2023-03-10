@@ -110,11 +110,11 @@ if __name__ == "__main__":
     # print ( rws.isEmptying(22, 5))
     # print ( rws.isEmptying(22, 6))
     # print ( rws.isEmptying(8, 0))
-    rws.getCatalogus()
+    #rws.getCatalogus()
     #print(rws.getCatalogus())
-    for location in rws.catalogus:
-                if location["Code"].startswith("IJM" ):
-                    print( location)
+    #for location in rws.catalogus:
+    #            if location["Code"].startswith("IJM" ):
+    #               print( location)
     #print(rws.catalogus)
     
     print(rws.getWaterLevel("IJMH"))
