@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#import adafruit_ads1x15.ads1015 as ADS
+import adafruit_ads1x15.ads1015 as ADS
 
 """
 Created on Sun Oct 24 20:47:15 2021
@@ -48,9 +48,9 @@ BTN_SHUTDOWN = 13
 BTN_NAP = 19
 BTN_EMPTY = 26
 
-#PR_VLISSINGEN = ADS.P1
-#PR_IJMUIDEN = ADS.P2
-#PR_53 = ADS.P3
+PR_VLISSINGEN = ADS.P1
+PR_IJMUIDEN = ADS.P2
+PR_53 = ADS.P3
 
 NAPLogger = "https://maker.ifttt.com/trigger/NAPLogger/json/with/key/" + secret.key
 
