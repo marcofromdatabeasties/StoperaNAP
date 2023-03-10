@@ -61,7 +61,7 @@ class NAPMonument:
         self.pressureSensor = PressureSensor()
         self.rws = RWS()
         ET.phoneHome("Wake up")
-        starttime = datetime.now()
+        starttime = datetime.now() - timedelta(days=1)
        
     def start(self):
         
@@ -82,7 +82,7 @@ class NAPMonument:
         
         while True:
             try:
-                if starttime + timedelta(hours=24) > datetime.now():
+                if starttime + timedelta(days=1) > datetime.now():
                     starttime = datetime.now()
                     req = urllib.request.Request(constants.IP_API)
                     response = urllib.request.urlopen(req)
@@ -116,13 +116,14 @@ class NAPMonument:
                     logging.error("%s", self.Vlissingen.measure_location + str(e))
                     ET.phoneHome("%s" % self.Vlissingen.measure_location + str(e))
                     traceback.print_stack()
-            try:    
-                self.Watersnood.runWorlds()
-                time.sleep(constants.COLUMN_WAIT)
-            except Exception as e:
-                    logging.error("%s", self.Watersnood +  str(e))
-                    ET.phoneHome("%s" % self.Watersnood.measure_location + str(e))
-                    traceback.print_stack()
+            
+            #try:    
+            self.Watersnood.runWorlds()
+            time.sleep(constants.COLUMN_WAIT)
+            #except Exception as e:
+            #        logging.error("%s", self.Watersnood + str(e))
+            #        ET.phoneHome("%s" % self.Watersnood.measure_location + str(e))
+            #        traceback.print_stack()
            
     #obsolete function in case of interrupt troubles on-site
     def buttonTesting(self):
