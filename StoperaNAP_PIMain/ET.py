@@ -21,6 +21,7 @@ def phoneHome(what):
         req.add_header('Content-Length', len(jsondataasbytes))
     
         response = urllib.request.urlopen(req, jsondataasbytes)
+        response.read()
     
     finally:
         dummy = 1; 
