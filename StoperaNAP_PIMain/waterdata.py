@@ -55,6 +55,9 @@ class RWS:
             return constants.NAP_COLUMN_LEVEL
         
         if datetime.now() > self.catalogus_time:
+            result = {}
+        
+        if (not measure_location in self.result.keys()):
             self.catalogus_time = datetime.now() + self.minutes_10
             self.result[measure_location] = constants.NAP_COLUMN_LEVEL
             
