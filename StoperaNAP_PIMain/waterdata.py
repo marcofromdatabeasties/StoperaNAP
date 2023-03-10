@@ -38,13 +38,13 @@ class RWS:
         jsondataasbytes = jsondata.encode('utf-8')   # needs to be bytes
         req.add_header('Content-Length', len(jsondataasbytes))
 
-        response = urllib.request.urlopen(req, jsondataasbytes)
-        body = response.read()
-        if (response.status == 200):
-            result = json.loads(body.decode("utf-8"))
-            self.catalogus = result['LocatieLijst']
-            return True
-        return False
+        with urllib.request.urlopen(req, jsondataasbytes) as response:
+            body = response.read()
+            if (response.status == 200):
+                result = json.loads(body.decode("utf-8"))
+                self.catalogus = result['LocatieLijst']
+                return True
+            return False
     
     def getWaterLevel(self, measure_location):
         currenttime = datetime.now().time()

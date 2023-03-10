@@ -8,6 +8,7 @@ Created on Tue Jan  3 16:03:46 2023
 
 import urllib.request
 import constants
+import time
 
 import json
 
@@ -20,11 +21,12 @@ def phoneHome(what):
         jsondataasbytes = jsondata.encode('utf-8')   # needs to be bytes
         req.add_header('Content-Length', len(jsondataasbytes))
     
-        response = urllib.request.urlopen(req, jsondataasbytes)
-        response.read()
+        with urllib.request.urlopen(req, jsondataasbytes) as f:
+            f.read()
     
     finally:
-        dummy = 1; 
+        dummy = 1;
+        time.sleep(1)
     
 if __name__ == "__main__":
     phoneHome("test")
