@@ -104,7 +104,7 @@ class NAPMonument:
                 traceback.print_stack()    
             
             try:
-                self.buttonsUp()
+                #self.buttonsUp()
                 self.buttonTesting()
                 self.IJmuiden.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
