@@ -57,7 +57,9 @@ class NAPMonument:
         time.sleep(1)
         self.screen.clear()
         self.screen.writeInfoToScreen("Hello! wait 5m")
-        time.sleep(60*5) #sleep 5 minutes
+        for i in range(0,6):
+            time.sleep(60*i) #sleep 5 minutes
+            self.screen.writeInfoToScreen("Hello! wait %dm" % 5-i)
         self.pressureSensor = PressureSensor()
         self.rws = RWS()
         ET.phoneHome("Wake up")
