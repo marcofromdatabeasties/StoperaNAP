@@ -87,7 +87,7 @@ class WaterColumn1953 (WaterColumn):
     start_time = datetime.now()
     
     def getWaterLevel(self):
-        if self.start_time + timedelta(minutes=constants.HALF_CYCLE_TIME_1953 * 2) < datetime.now():
+        if self.start_time + timedelta(minutes=(constants.HALF_CYCLE_TIME_1953 * 2)) < datetime.now():
                 self.start_time = datetime.now()
         if self.start_time + timedelta(minutes=constants.HALF_CYCLE_TIME_1953) < datetime.now():
             return 0.0

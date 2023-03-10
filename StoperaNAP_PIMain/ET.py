@@ -23,7 +23,7 @@ def phoneHome(what):
         response = urllib.request.urlopen(req, jsondataasbytes)
     
     finally:
-        dummy = 1
+        dummy = 1; 
     
 if __name__ == "__main__":
     phoneHome("test")

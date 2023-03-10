@@ -55,7 +55,7 @@ class NoWhere(State):
         
         new_state = Pauze()
         new_state.start_time = time.time()
-        new_state.delta_time = 5
+        new_state.delta_time = 2
         return new_state
 
     def getName(self):
@@ -69,7 +69,7 @@ class Good(State):
         
         new_state = Off()
         new_state.start_time = time.time()
-        new_state.delta_time = 30 
+        new_state.delta_time = 90 
     
         return new_state
         #return self.handleState(level_column, level_desired) 
@@ -105,7 +105,7 @@ class Pauze(State):
         if self.start_time + self.delta_time < time.time():
             new_state = Off()
             new_state.start_time = time.time()
-            new_state.delta_time = 35  
+            new_state.delta_time = 10  
         
         return new_state
        
@@ -122,7 +122,7 @@ class High(State):
         
         new_state = Pauze()
         new_state.start_time = time.time()
-        new_state.delta_time = max(0.5, min(40, abs((level_column*100) - (level_desired*100))))
+        new_state.delta_time = max(0.5, min(60, abs((level_column*100) - (level_desired*100))))
         
         return new_state
     
