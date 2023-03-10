@@ -25,7 +25,6 @@ import urllib.request
 import json
 
 class NAPMonument:
-    starttime = datetime.now() - timedelta(hours=24)
     
     def buttonsUp(self):
     
@@ -34,6 +33,7 @@ class NAPMonument:
         GPIO.setup(constants.PUMP_IJMUIDEN, GPIO.OUT)
         GPIO.setup(constants.PUMP_VLISSINGEN, GPIO.OUT)
         GPIO.setup(constants.PUMP_53, GPIO.OUT)
+        
         GPIO.setup(constants.VL_53, GPIO.OUT)
         GPIO.setup(constants.VL_IJMUIDEN, GPIO.OUT)
         GPIO.setup(constants.VL_VLISSINGEN, GPIO.OUT)
@@ -61,7 +61,7 @@ class NAPMonument:
         self.pressureSensor = PressureSensor()
         self.rws = RWS()
         ET.phoneHome("Wake up")
-        starttime = datetime.now() - timedelta(days=1)
+        self.starttime = datetime.now() - timedelta(days=1)
        
     def start(self):
         
@@ -75,7 +75,7 @@ class NAPMonument:
                                       , self.pressureSensor, self.screen, self.rws, 1)
         
         self.Watersnood = WaterColumn1953(constants.COLUMN_3_LOCATION, constants.PR_53,
-                                      constants.VL_53,constants.PUMP_53
+                                      constants.VL_53, constants.PUMP_53
                                       , self.pressureSensor, self.screen, self.rws, 2)
 
 
@@ -83,7 +83,7 @@ class NAPMonument:
         while True:
             try:
                 if starttime + timedelta(days=1) > datetime.now():
-                    starttime = datetime.now()
+                    self.starttime = datetime.now()
                     req = urllib.request.Request(constants.IP_API)
                     response = urllib.request.urlopen(req)
                     body = response.read()
@@ -92,7 +92,7 @@ class NAPMonument:
                         ip = result['ip']
                         ET.phoneHome("remote ip: %s" % ip)
                     else:
-                        starttime = datetime.now() + timedelta(hours=1)
+                        self.starttime = datetime.now() + timedelta(hours=1)
                     
             except Exception as e:
                 starttime = datetime.now() + timedelta(hours=1)
@@ -117,13 +117,13 @@ class NAPMonument:
                     ET.phoneHome("%s" % self.Vlissingen.measure_location + str(e))
                     traceback.print_stack()
             
-            #try:    
-            self.Watersnood.runWorlds()
-            time.sleep(constants.COLUMN_WAIT)
-            #except Exception as e:
-            #        logging.error("%s", self.Watersnood + str(e))
-            #        ET.phoneHome("%s" % self.Watersnood.measure_location + str(e))
-            #        traceback.print_stack()
+            try:    
+                self.Watersnood.runWorlds()
+                time.sleep(constants.COLUMN_WAIT)
+            except Exception as e:
+                    logging.error("%s", self.Watersnood + str(e))
+                    ET.phoneHome("%s" % self.Watersnood.measure_location + str(e))
+                    traceback.print_stack()
            
     #obsolete function in case of interrupt troubles on-site
     def buttonTesting(self):

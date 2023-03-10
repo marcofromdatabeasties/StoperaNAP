@@ -39,6 +39,7 @@ class LCD:
             #print(text)
             self.lcd.cursor_pos = (screenRow, 0)
             self.lcd.write_string(text)
+            time.sleep(0.05)
             self.ms = time.time()
             self.lastRow = screenRow
             self.times += 1
