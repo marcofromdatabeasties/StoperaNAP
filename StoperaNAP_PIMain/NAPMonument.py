@@ -85,15 +85,17 @@ class NAPMonument:
                 if self.starttime + timedelta(days=1) < datetime.now():
                     self.starttime = datetime.now()
                     req = urllib.request.Request(constants.IP_API)
+                    ip = ""
                     with  urllib.request.urlopen(req) as response:
                         body = response.read()
                         if (response.status == 200):
                             result = json.loads(body.decode("utf-8"))
                             ip = result['ip']
-                            ET.phoneHome("remote ip: %s" % ip)
                             time.sleep(1)
                         else:
                             self.starttime = datetime.now() + timedelta(hours=1)
+                            
+                    ET.phoneHome("remote ip: %s" % ip)
                     
             except Exception as e:
                 starttime = datetime.now() + timedelta(hours=1)
