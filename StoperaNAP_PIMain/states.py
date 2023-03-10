@@ -122,7 +122,7 @@ class High(State):
         
         new_state = Pauze()
         new_state.start_time = time.time()
-        new_state.delta_time = max(0.5, min(30, abs((level_column*100) - (level_desired*100))/3))
+        new_state.delta_time = max(0.5, min(20, abs((level_column*100) - (level_desired*100))/5))
         
         return new_state
     
@@ -139,7 +139,7 @@ class Low(State):
         
         new_state = Pauze()
         new_state.start_time = time.time()
-        new_state.delta_time = max(1, min(50, abs((level_column*100) - (level_desired*100))))
+        new_state.delta_time = max(1, min(50, abs((level_column*100) - (level_desired*100))/2))
         
         return new_state
 
