@@ -82,7 +82,7 @@ class NAPMonument:
         
         while True:
             try:
-                if starttime + timedelta(days=1) < datetime.now():
+                if self.starttime + timedelta(days=1) < datetime.now():
                     self.starttime = datetime.now()
                     req = urllib.request.Request(constants.IP_API)
                     response = urllib.request.urlopen(req)
