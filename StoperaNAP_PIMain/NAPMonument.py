@@ -22,6 +22,7 @@ import ET
 import sys, traceback
 from datetime import timedelta, datetime
 import urllib.request
+import json
 
 class NAPMonument:
     starttime = datetime.now() - timedelta(hours=24)
@@ -60,6 +61,7 @@ class NAPMonument:
         self.pressureSensor = PressureSensor()
         self.rws = RWS()
         ET.phoneHome("Wake up")
+        starttime = datetime.now()
        
     def start(self):
         
@@ -97,12 +99,11 @@ class NAPMonument:
                 logging.error("No ip", str(e))
                 ET.phoneHome("ip error: %s" % str(e))
                 traceback.print_stack()    
+            
             try:
                 self.buttonsUp()
                 self.buttonTesting()
                 self.IJmuiden.runWorlds()
-                
-                
                 time.sleep(constants.COLUMN_WAIT)
             except Exception as e:
                     logging.error("%s", self.IJmuiden.measure_location + str(e))
