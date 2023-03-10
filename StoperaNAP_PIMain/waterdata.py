@@ -74,18 +74,18 @@ class RWS:
                 jsondataasbytes = jsondata.encode('utf-8')   # needs to be bytes
                 req.add_header('Content-Length', len(jsondataasbytes))
         
-                response = urllib.request.urlopen(req, jsondataasbytes)
-                body = response.read()
-                if (response.status == 200):
-                    doc = json.loads(body.decode("utf-8"))
-                    observations = doc['WaarnemingenLijst'][0]
-                    measurements = observations['MetingenLijst'][0]
-                    self.catalogus_time = datetime.now() + self.minutes_10
-                    measurement = measurements['Meetwaarde']
-                    value = measurement['Waarde_Numeriek'] / 100 # to meters
-                    self.result[measure_location] = value 
-                    ET.phoneHome("OK, retrieved new waterlevel for %s" % measure_location)
-                    return value
+                with urllib.request.urlopen(req, jsondataasbytes) as response:
+                    body = response.read()
+                    if (response.status == 200):
+                        doc = json.loads(body.decode("utf-8"))
+                        observations = doc['WaarnemingenLijst'][0]
+                        measurements = observations['MetingenLijst'][0]
+                        self.catalogus_time = datetime.now() + self.minutes_10
+                        measurement = measurements['Meetwaarde']
+                        value = measurement['Waarde_Numeriek'] / 100 # to meters
+                        self.result[measure_location] = value 
+                        ET.phoneHome("OK, retrieved new waterlevel for %s" % measure_location)
+                        return value
 
         return self.result[measure_location]
         
