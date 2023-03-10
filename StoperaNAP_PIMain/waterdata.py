@@ -23,7 +23,7 @@ class RWS:
     
     def isEmptying(self, hour, day):
         #monday is 0
-        return ( not(7 <= hour <= 22)) or (day in {5, 6} and constants.NO_WEEKEND)
+        return ( not(4 <= hour <= 20)) or (day in {5, 6} and constants.NO_WEEKEND)
     
     
     def getLastUpdate(self):
