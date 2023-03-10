@@ -93,7 +93,7 @@ class NAPMonument:
                         starttime = datetime.now() + timedelta(hours=1)
                     
             except Exception as e:
-                starttime = datetime.now().time() + timedelta(hour=1)
+                starttime = datetime.now() + timedelta(hours=1)
                 logging.error("No ip", str(e))
                 ET.phoneHome("ip error: %s" % str(e))
                 traceback.print_stack()    
