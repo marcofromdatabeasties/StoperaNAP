@@ -100,11 +100,16 @@ class NAPMonument:
                     ET.phoneHome("remote ip: %s" % ip)
                     
             except Exception as e:
-                starttime = datetime.now() + timedelta(hours=1)
+                starttime = datetime.now() + timedelta(hours=8)
                 logging.error("No ip", str(e))
                 ET.phoneHome("ip error: %s" % str(e))
-                traceback.print_stack()    
-            
+                traceback.print_stack()
+                if not (self.ping(constants.WaterData["NU"]) 
+                        and self.ping(constants.WaterData["GOOGLE"])
+                        and self.ping(constants.WaterData["AWS"])
+                        and self.ping(constants.WaterData["NOS"])):
+                    #nobody home, link down? let's reboot
+                    os.system("shutdown /r /t 0")
             try:
                 #self.buttonsUp()
                 self.buttonTesting()
@@ -172,4 +177,11 @@ class NAPMonument:
     def setNAPToEmptyOrNot(self):
             self.IJmuiden.setLevelToEmpty()
             self.Vlissingen.setLevelToEmpty()
-    
+            
+    def ping(self, host):
+        hostname = "google.com" #example
+        response = os.system("ping -c 1 " + host)
+        
+        #and then check the response...
+        return  response == 0
+            
