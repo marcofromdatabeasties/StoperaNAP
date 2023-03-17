@@ -142,9 +142,9 @@ class NAPMonument:
     def buttonTesting(self):
         # GPIO.setmode(GPIO.BCM) 
         # GPIO.setwarnings(False)
-        # GPIO.setup(constants.BTN_SHUTDOWN, GPIO.IN, GPIO.PUD_UP)
-        # GPIO.setup(constants.BTN_EMPTY, GPIO.IN, GPIO.PUD_UP) 
-        # GPIO.setup(constants.BTN_NAP, GPIO.IN, GPIO.PUD_UP)
+        GPIO.setup(constants.BTN_SHUTDOWN, GPIO.IN, GPIO.PUD_UP)
+        GPIO.setup(constants.BTN_EMPTY, GPIO.IN, GPIO.PUD_UP) 
+        GPIO.setup(constants.BTN_NAP, GPIO.IN, GPIO.PUD_UP)
         
         if GPIO.input(constants.BTN_SHUTDOWN) == GPIO.LOW:
             self.shutdown_h_now()
