@@ -113,7 +113,7 @@ class NAPMonument:
                         and self.ping(constants.WaterData["AWS"])
                         and self.ping(constants.WaterData["NOS"])):
                     #nobody home, link down? let's reboot
-                    os.system("shutdown /r /t 0")
+                    os.system("sudo shutdown /r /t 0")
             try:
                 #self.buttonsUp()
                 self.buttonTesting()
@@ -149,6 +149,8 @@ class NAPMonument:
         GPIO.setup(constants.BTN_SHUTDOWN, GPIO.IN, GPIO.PUD_UP)
         GPIO.setup(constants.BTN_EMPTY, GPIO.IN, GPIO.PUD_UP) 
         GPIO.setup(constants.BTN_NAP, GPIO.IN, GPIO.PUD_UP)
+        time.sleep(0.02)
+        
         
         if GPIO.input(constants.BTN_SHUTDOWN) == GPIO.LOW:
             self.shutdown_h_now()
@@ -158,19 +160,21 @@ class NAPMonument:
         else:
             self.Vlissingen.setToNormal()
             self.IJmuiden.setToNormal()
+            self.Watersnood.setToNormal()
         
         if GPIO.input(constants.BTN_EMPTY) == GPIO.LOW:
             self.setNAPToEmptyOrNot()
         else:
             self.Vlissingen.setToNormal()
             self.IJmuiden.setToNormal()
+            self.Watersnood.setToNormal()
 
     def shutdown_h_now(self):
         time.sleep(0.05)
         GPIO.cleanup()
         self.screen.clear()
         self.screen.writeInfoToScreen("Shutdown...")
-        os.system("systemctl poweroff -i")
+        os.system("shutdown -h now")
         time.sleep(3)
         self.screen.writeInfoToScreen("Bye...")
             
