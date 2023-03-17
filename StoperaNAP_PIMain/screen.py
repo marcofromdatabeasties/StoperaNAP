@@ -45,6 +45,7 @@ class LCD:
             self.times += 1
         
         if self.times % 33 == 0:
+            self.lcd.cursor_mode = 'hide'
             self.clear()
     
         
