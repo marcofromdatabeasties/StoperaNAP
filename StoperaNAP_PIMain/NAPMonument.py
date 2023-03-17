@@ -124,7 +124,7 @@ class NAPMonument:
                 self.Watersnood.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
             except Exception as e:
-                    logging.error("%s", self.Watersnood + str(e))
+                    logging.error("%s", self.Watersnood.measure_location + str(e))
                     ET.phoneHome("%s" % self.Watersnood.measure_location + str(e))
                     traceback.print_stack()
             
