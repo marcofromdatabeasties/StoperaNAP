@@ -42,7 +42,7 @@ class WaterColumn:
         
     def getWaterLevel(self):
         if (self.zero):
-            return 0
+            return 0.0
         if (self.empty):
             return constants.NAP_COLUMN_LEVEL
         return self.rws.getWaterLevel(self.measure_location)

@@ -177,10 +177,12 @@ class NAPMonument:
     def setNAPToZeroOrNot(self):
             self.IJmuiden.setLevelToZero()
             self.Vlissingen.setLevelToZero()
+            self.Watersnood.setLevelToZero()
             
     def setNAPToEmptyOrNot(self):
             self.IJmuiden.setLevelToEmpty()
             self.Vlissingen.setLevelToEmpty()
+            self.Watersnood.etLevelToEmpty()
             
     def ping(self, host):
         response = os.system("ping -c 1 " + host)
