@@ -13,14 +13,14 @@ import secret
 NAP_COLUMN_LEVEL = -2.06 #meters to NAP
 NAP_COLUMN_HEIGHT = 6.06 #max column height
 NAP_COLUMN_MAX_LEVEL = {
-    "IJMH": 3.5, "RPBU": 4.0, "1953": 2.6  #max_level
+    "IJMH": 3.5, "RPBU": 4.0, "1953": 3.1  #max_level
 }
 TEN_S_EQUAL_ERROR_COUNT = 50 #times level stays the same
 #with a column width of 50cm and a pump of 120Lt/min, a centimeter column is 0,31 ltr so a reaction time of 2g = 159 ms. 
 #COLUMN_WAIT = 0.079
 COLUMN_WAIT = .15
 HALF_CYCLE_TIME_1953=7 #in seconds
-LEVEL_1953 = 2.30
+LEVEL_1953 = 3.00
 COLUMN_1_LOCATION="IJMH"
 COLUMN_2_LOCATION="RPBU"
 COLUMN_3_LOCATION="1953"
