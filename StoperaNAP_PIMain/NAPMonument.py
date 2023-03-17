@@ -183,7 +183,6 @@ class NAPMonument:
             self.Vlissingen.setLevelToEmpty()
             
     def ping(self, host):
-        hostname = "google.com" #example
         response = os.system("ping -c 1 " + host)
         
         #and then check the response...

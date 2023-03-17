@@ -66,8 +66,8 @@ WaterData = {
     }},
     "RetrieveCatalogus": "https://waterwebservices.rijkswaterstaat.nl/METADATASERVICES_DBO/OphalenCatalogus/",
     "RetrieveObservation": "https://waterwebservices.rijkswaterstaat.nl/ONLINEWAARNEMINGENSERVICES_DBO/OphalenLaatsteWaarnemingen",
-    "NU": "https://www.nu.nl",
-    "GOOGLE": "https://www.google.com",
-    "NOS": "https://www.nos.nl",
-    "AWS": "https://www.aws.com"
+    "NU": "nu.nl",
+    "GOOGLE": "google.com",
+    "NOS": "nos.nl",
+    "AWS": "aws.com"
 }
