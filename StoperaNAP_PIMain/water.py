@@ -59,26 +59,28 @@ class WaterColumn:
         self.empty = False
             
     def runWorlds(self):
-        #NAP start  + NAP level equals column height 
-        level_column = constants.NAP_COLUMN_LEVEL + self.pressureSensor.getColumnLevel(self.channel)
+        #NAP start  + NAP level equals column height
+        raw_level, ok = self.pressureSensor.getColumnLevel(self.channel)
+        if (ok):
+            level_column = constants.NAP_COLUMN_LEVEL + raw_level
+                
+            level_desired = self.getWaterLevel() 
             
-        level_desired = self.getWaterLevel() 
-        
-        self.state = self.state.execute(self.measure_location, level_column, level_desired,  self.pin_valve, self.pin_pump, self.screen)
-                
-        #check if an hardware error is occuring
-        if (self.previous_level == level_column and level_desired > level_column):
-            self.counter += 1
-            if (self.counter > constants.TEN_S_EQUAL_ERROR_COUNT): #no change in water level after x iterations, something is wrong -> Error
-                self.state = states.Error()
-                
-        else:
-            self.counter = 0
-            self.previous_level = level_column
-        #print ("Level Desired Column {0:2.2f}".format(level_desired))
-        self.screen.writeToScreen(self.measure_location, self.state.getName(), level_column 
-                                  , level_desired, self.screenRow)
-        
+            self.state = self.state.execute(self.measure_location, level_column, level_desired,  self.pin_valve, self.pin_pump, self.screen)
+                    
+            #check if an hardware error is occuring
+            if (self.previous_level == level_column and level_desired > level_column):
+                self.counter += 1
+                if (self.counter > constants.TEN_S_EQUAL_ERROR_COUNT): #no change in water level after x iterations, something is wrong -> Error
+                    self.state = states.Error()
+                    
+            else:
+                self.counter = 0
+                self.previous_level = level_column
+            #print ("Level Desired Column {0:2.2f}".format(level_desired))
+            self.screen.writeToScreen(self.measure_location, self.state.getName(), level_column 
+                                      , level_desired, self.screenRow)
+        #sensor was not ready to read data.
      
                 
 class WaterColumn1953 (WaterColumn):
