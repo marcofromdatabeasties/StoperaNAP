@@ -66,8 +66,8 @@ class NAPMonument:
                 self.screen.writeInfoToScreen("Hello! wait %s min" % str(5-i))
         self.pressureSensor = PressureSensor()
         self.rws = RWS()
-        ET.phoneHome("Wake up")
         self.starttime = datetime.now() - timedelta(days=1)
+        ET.phoneHome("Wake up")
        
     def start(self):
         
