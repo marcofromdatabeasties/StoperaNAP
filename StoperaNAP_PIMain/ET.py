@@ -9,6 +9,7 @@ Created on Tue Jan  3 16:03:46 2023
 import urllib.request
 import constants
 import time
+import logging
 
 import json
 
@@ -25,14 +26,6 @@ def phoneHome(what):
             f.read()
     
     finally:
-        dummy = 1;
-        time.sleep(1)
-    
-if __name__ == "__main__":
-    phoneHome("test")
-    
-    try:
-        app()
-        
-    except Exception as e:
-       phoneHome(str(e))
+        time.sleep(.05)
+        logging.debug(what)
+ 

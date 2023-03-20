@@ -15,7 +15,7 @@ class LCD:
     lastRow = -1
     times = 0
     
-    def initScreen(self):
+    def __init__(self):
         self.lcd = CharLCD(i2c_expander='PCF8574', address=0x27, port=1,
               cols=20, rows=4, dotsize=8,
               charmap='A00',
@@ -24,7 +24,6 @@ class LCD:
         self.lcd.cursor_mode = 'hide'
 
     def writeToScreen(self, location, status, current_level , desired_level, screenRow):
-        self.initScreen()
         #timing to reduce screen update problems.
         if (self.ms + 1 < time.time()) and self.lastRow != screenRow:
             kolom_ind = location[0:4] 

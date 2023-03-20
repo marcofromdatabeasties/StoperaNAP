@@ -11,6 +11,7 @@ from datetime import timedelta, datetime
 import constants
 import json
 import ET
+import logging
 #from numpy.core.defchararray import startswith
 
 class RWS:
@@ -121,6 +122,8 @@ if __name__ == "__main__":
     #print(rws.catalogus)
     
     print(rws.getWaterLevel("IJMH"))
+    
+    logging.debug('test123')
     # print(rws.getWaterLevel("IJMH"))
     # print(rws.getWaterLevel("IJMH"))
     # print(rws.getWaterLevel("RPBU"))

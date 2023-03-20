@@ -120,7 +120,7 @@ class NAPMonument:
                 self.IJmuiden.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
             except Exception as e:
-                    logging.error("%s", self.IJmuiden.measure_location + str(e))
+                    logging.exception("%s", self.IJmuiden.measure_location + str(e))
                     ET.phoneHome("%s" % self.IJmuiden.measure_location + str(e))
                     traceback.print_stack()
             
@@ -128,7 +128,7 @@ class NAPMonument:
                 self.Watersnood.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
             except Exception as e:
-                    logging.error("%s", self.Watersnood.measure_location + str(e))
+                    logging.exception("%s", self.Watersnood.measure_location + str(e))
                     ET.phoneHome("%s" % self.Watersnood.measure_location + str(e))
                     traceback.print_stack()
             
@@ -136,7 +136,7 @@ class NAPMonument:
                 self.Vlissingen.runWorlds()
                 time.sleep(constants.COLUMN_WAIT)
             except Exception as e:
-                    logging.error("%s", self.Vlissingen.measure_location + str(e))
+                    logging.exception("%s", self.Vlissingen.measure_location + str(e))
                     ET.phoneHome("%s" % self.Vlissingen.measure_location + str(e))
                     traceback.print_stack()
             
