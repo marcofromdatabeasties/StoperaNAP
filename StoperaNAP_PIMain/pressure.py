@@ -14,7 +14,7 @@ class PressureSensor:
     
     def __init__(self):
         self.ADS = ADS1x15.ADS1115(1, 0x48)
-        self.ADS.setGain(ADS.PGA_4_096V)
+        self.ADS.setGain(self.ADS.PGA_4_096V)
     
     def getColumnLevel(self, channel):    
         raw = self.ADS.readADC(0) 

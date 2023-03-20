@@ -171,12 +171,12 @@ class NAPMonument:
 
     def shutdown_h_now(self):
         time.sleep(0.05)
-        GPIO.cleanup()
         self.screen.clear()
         self.screen.writeInfoToScreen("Shutdown...")
-        os.system("shutdown -h now")
-        time.sleep(3)
-        self.screen.writeInfoToScreen("Bye...")
+        response = os.system("shutdown -h now")
+        #time.sleep(3)
+        self.screen.writeInfoToScreen("Bye... %d" % response)
+        GPIO.cleanup()
             
     def setNAPToZeroOrNot(self):
             self.IJmuiden.setLevelToZero()
