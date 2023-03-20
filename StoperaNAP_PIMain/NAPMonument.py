@@ -19,7 +19,7 @@ import os
 from pressure import PressureSensor
 from waterdata import RWS
 import ET
-import sys, traceback
+import traceback
 from datetime import timedelta, datetime
 import urllib.request
 import json
@@ -104,7 +104,7 @@ class NAPMonument:
                     ET.phoneHome("remote ip: %s" % ip)
                     
             except Exception as e:
-                starttime = datetime.now() + timedelta(hours=8)
+                self.starttime = datetime.now() + timedelta(hours=8)
                 logging.error("No ip", str(e))
                 ET.phoneHome("ip error: %s" % str(e))
                 traceback.print_stack()

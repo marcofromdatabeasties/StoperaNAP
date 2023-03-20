@@ -1,5 +1,8 @@
-adafruit-circuitpython-ads1x15
 RPi.GPIO
 urllib3
 zipfile36
 RPLCD
+
+#new
+smbus2
+ADS1x15-ADC

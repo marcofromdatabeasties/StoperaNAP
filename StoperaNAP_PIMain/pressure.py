@@ -5,32 +5,27 @@ Created on Wed Oct 20 16:37:42 2021
 
 @author: ubuntu
 """
+import ADS1x15
 
-import threading
-import board
-import busio
-import adafruit_ads1x15.ads1115 as ADS
-from adafruit_ads1x15.analog_in import AnalogIn
-
+#https://github.com/chandrawi/ADS1x15-ADC
+#deze moet anders
 
 class PressureSensor:
     
     def __init__(self):
-        self.lock = threading.Lock()
-        self.i2c = busio.I2C(board.SCL, board.SDA)  
-        self.ads = ADS.ADS1115(self.i2c)
-        self.ads.mode = ADS.Mode.SINGLE
+        self.ADS = ADS1x15.ADS1115(1, 0x48)
+        self.ADS.setGain(ADS.PGA_4_096V)
     
-    def getColumnLevel(self, channel):
-
-        value = AnalogIn(self.ads, channel).voltage       
+    def getColumnLevel(self, channel):    
+        raw = self.ADS.readADC(0) 
+        value = self.ADS.toVoltage(raw)
 
         #4mA minimal current of pressure sensor (gets 0.8v ).
-        #20mA max current is 4v
+        #30mA max current is 4v
         return (value * 3.25 -2.59)
-    
+
     
 if __name__ == "__main__":
     pressure = PressureSensor()
-    print(pressure.getColumnLevel(ADS.P1))
+    print(pressure.getColumnLevel(0))
         

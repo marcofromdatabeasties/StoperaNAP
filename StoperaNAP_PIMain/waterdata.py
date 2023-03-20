@@ -63,7 +63,6 @@ class RWS:
             
             loc = self.getLocation(measure_location);
             if loc != False:
-        
                 data = {"AquoPlusWaarnemingMetadataLijst" :[{"AquoMetadata":{"Compartiment": 
                             {"Code":"OW"},"Eenheid":{"Code":"cm"},
                             "Hoedanigheid":{"Code":"NAP"}}}],

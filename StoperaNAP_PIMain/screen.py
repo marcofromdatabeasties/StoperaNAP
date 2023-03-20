@@ -11,23 +11,20 @@ import time
 
 
 class LCD:
+    ms = time.time()
+    lastRow = -1
+    times = 0
     
-    lcd = CharLCD(i2c_expander='PCF8574', address=0x27, port=1,
+    def initScreen(self):
+        self.lcd = CharLCD(i2c_expander='PCF8574', address=0x27, port=1,
               cols=20, rows=4, dotsize=8,
               charmap='A00',
               auto_linebreaks=False,
               backlight_enabled=True)
-    
-    def __init__(self):
-        self.lcd.cursor_pos = (3, 0)
-        self.lcd.write_string("V3.2 St. NAP/RWS/Stopera"[:18])
-        self.ms = time.time()
-        self.lastRow = -1
-        self.times = 0
         self.lcd.cursor_mode = 'hide'
 
     def writeToScreen(self, location, status, current_level , desired_level, screenRow):
-        
+        self.initScreen()
         #timing to reduce screen update problems.
         if (self.ms + 1 < time.time()) and self.lastRow != screenRow:
             kolom_ind = location[0:4] 

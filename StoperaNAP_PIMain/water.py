@@ -13,7 +13,6 @@ import states
 from pressure import PressureSensor
 import constants
 from datetime import timedelta, datetime
-from time import time
 
 class WaterColumn:
     state = states.NoWhere()
