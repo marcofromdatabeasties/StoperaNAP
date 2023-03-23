@@ -28,7 +28,7 @@ class PressureSensor:
         #4mA minimal current of pressure sensor (gets 0.8v ).
         #30mA max current is 4v
         return (value * 3.25 -2.59), True
-        logging.error( "Trouble reading ADS value")
+        logging.info( "Reading ADS %d value %f" % value)
         return 0, False
     
 if __name__ == "__main__":
