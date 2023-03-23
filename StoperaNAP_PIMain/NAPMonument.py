@@ -113,7 +113,7 @@ class NAPMonument:
                         and self.ping(constants.WaterData["AWS"])
                         and self.ping(constants.WaterData["NOS"])):
                     #nobody home, link down? let's reboot
-                    os.system("sudo shutdown /r /t 0")
+                    os.system("sudo reboot")
             try:
                 #self.buttonsUp()
                 self.buttonTesting()
