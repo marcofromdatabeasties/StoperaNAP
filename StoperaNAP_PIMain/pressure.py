@@ -14,7 +14,7 @@ import logging
 class PressureSensor:
     
     def __init__(self):
-        self.ADS = ADS1x15.ADS1115(0x48)
+        self.ADS = ADS1x15.ADS1115(1, 0x48)
         self.ADS.setGain(self.ADS.PGA_4_096V)
         self.ADS.setMode(self.ADS.MODE_SINGLE)
     
