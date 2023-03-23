@@ -47,9 +47,9 @@ BTN_SHUTDOWN = 13
 BTN_NAP = 19
 BTN_EMPTY = 26
 
-PR_VLISSINGEN = 0
-PR_IJMUIDEN = 1
-PR_53 = 2
+PR_VLISSINGEN = 1
+PR_IJMUIDEN = 2
+PR_53 = 3
 
 NAPLogger = "https://maker.ifttt.com/trigger/NAPLogger/json/with/key/" + secret.key
 
