@@ -24,7 +24,7 @@ class RWS:
     
     def isEmptying(self, hour, day):
         #monday is 0
-        return ( not(4 <= hour <= 20)) or (day in {5, 6} and constants.NO_WEEKEND)
+        return ( not(5 <= hour <= 20)) or (day in {5, 6} and constants.NO_WEEKEND)
     
     
     def getLastUpdate(self):
@@ -54,11 +54,14 @@ class RWS:
         if self.isEmptying(hour, day):
             self.catalogus_time = datetime.now() + self.minutes_10
             return constants.NAP_COLUMN_LEVEL
-        
+
+        #get old level in case of problems        
+        previous_level = constants.NAP_COLUMN_LEVEL
+        if (measure_location in self.result.keys()):
+            previous_level = self.result[measure_location]
+
+        #when new data is exected retreive data        
         if datetime.now() > self.catalogus_time:
-            self.result = {}
-        
-        if (not measure_location in self.result.keys()):
             self.catalogus_time = datetime.now() + self.minutes_10
             self.result[measure_location] = constants.NAP_COLUMN_LEVEL
             
@@ -69,7 +72,6 @@ class RWS:
                             "Hoedanigheid":{"Code":"NAP"}}}],
                             "LocatieLijst":[loc]}
                 
-               
                 req = urllib.request.Request(constants.WaterData['RetrieveObservation'])
                 req.add_header('Content-Type', 'application/json')
                 
@@ -90,7 +92,7 @@ class RWS:
                         ET.phoneHome("OK, retrieved new waterlevel for %s" % measure_location)
                         return value
 
-        return self.result[measure_location]
+        return previous_level
         
     
     def getLocation(self, code):

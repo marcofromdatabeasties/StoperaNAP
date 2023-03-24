@@ -24,7 +24,8 @@ def phoneHome(what):
     
         with urllib.request.urlopen(req, jsondataasbytes) as f:
             f.read()
-    
+    except Exception as e:
+       logging.exception(str(e)) 
     finally:
         time.sleep(.05)
         logging.debug(what)
