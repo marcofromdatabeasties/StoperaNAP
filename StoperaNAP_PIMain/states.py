@@ -63,7 +63,7 @@ class NoWhere(State):
 
 class Good(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
-        logging.info("%s = Level good ", location)
+        logging.debug("%s = Level good ", location)
         GPIO.output(pin_valve, GPIO.HIGH)
         GPIO.output(pin_pump, GPIO.HIGH)
         
@@ -82,7 +82,7 @@ class Off(State):
     delta_time = 0
     
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
-        logging.info("%s = off", location)
+        logging.debug("%s = off", location)
         GPIO.output(pin_valve, GPIO.HIGH)
         GPIO.output(pin_pump, GPIO.HIGH)
         
@@ -99,7 +99,7 @@ class Pauze(State):
     delta_time = 0 
     
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
-        logging.info("%s = pauze", location)
+        logging.debug("%s = pauze", location)
         
         new_state = self
         if self.start_time + self.delta_time < time.time():
@@ -115,7 +115,7 @@ class Pauze(State):
 
 class High(State):
     def execute(self, location,level_column, level_desired, pin_valve, pin_pump, screen):
-        logging.info("%s = Too high ", location)
+        logging.debug("%s = Too high ", location)
         GPIO.output(pin_valve, GPIO.LOW)
         GPIO.output(pin_pump, GPIO.HIGH)
        
@@ -133,7 +133,7 @@ class Low(State):
     start_time = -1
     delta_time = 0 
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
-        logging.info("%s = Too low", location)
+        logging.debug("%s = Too low", location)
         GPIO.output(pin_valve, GPIO.HIGH)
         GPIO.output(pin_pump, GPIO.LOW)
         
@@ -157,7 +157,7 @@ class Start(State):
                 
 class Error(State):
     def execute(self, location, level_column, level_desired, pin_valve, pin_pump, screen):
-        logging.info("%s = Error", location)
+        logging.warning("%s = Error", location)
         GPIO.output(pin_valve, GPIO.HIGH)
         GPIO.output(pin_pump, GPIO.HIGH)
         return self

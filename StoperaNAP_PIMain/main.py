@@ -15,8 +15,8 @@ def main():
 
     logFile = '/tmp/nap.log'
     
-    my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=5*1024*1024, 
-                                     backupCount=2, encoding=None, delay=0)
+    my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=512*1024, 
+                                     backupCount=1, encoding=None, delay=0)
     my_handler.setFormatter(log_formatter)
     my_handler.setLevel(logging.INFO)
     
