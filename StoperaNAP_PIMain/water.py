@@ -13,6 +13,7 @@ import states
 from pressure import PressureSensor
 import constants
 from datetime import timedelta, datetime
+import logging
 
 class WaterColumn:
     state = states.NoWhere()
@@ -78,9 +79,17 @@ class WaterColumn:
                 self.counter = 0
                 self.previous_level = level_column
             #print ("Level Desired Column {0:2.2f}".format(level_desired))
-            self.screen.writeToScreen(self.measure_location, self.state.getName(), level_column 
+            try:
+                    
+                self.screen.writeToScreen(self.measure_location, self.state.getName(), level_column 
                                       , level_desired, self.screenRow)
-        #sensor was not ready to read data.
+            except Exception as e:
+                #writing to the screen is of less importance because nobody is watching most  of the time.
+                #and because error 121 is a know bug of smb: 
+                #    https://stackoverflow.com/questions/45324851/smbus-on-the-rpi-gives-ioerror-errno-121-remote-i-o-error
+                #it will resolve over time by itself.
+                logging.exception("%s", self.measure_location + str(e))
+                    
      
                 
 class WaterColumn1953 (WaterColumn):
