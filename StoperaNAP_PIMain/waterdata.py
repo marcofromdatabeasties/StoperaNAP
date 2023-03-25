@@ -10,7 +10,6 @@ import urllib.request
 from datetime import timedelta, datetime
 import constants
 import json
-import ET
 import logging
 #from numpy.core.defchararray import startswith
 
@@ -79,11 +78,12 @@ class RWS:
                         doc = json.loads(body.decode("utf-8"))
                         observations = doc['WaarnemingenLijst'][0]
                         measurements = observations['MetingenLijst'][0]
-                        self.catalogus_time[measure_location] = datetime.now() + self.minutes_10
+                        
                         measurement = measurements['Meetwaarde']
                         value = measurement['Waarde_Numeriek'] / 100 # to meters
                         self.result[measure_location] = value 
-                        ET.phoneHome("OK, retrieved new waterlevel for %s" % measure_location)
+                        self.catalogus_time[measure_location] = datetime.now() + self.minutes_10
+                        logging.info("OK, retrieved new waterlevel for %s" % measure_location)
                         return value
 
         return self.result[measure_location]

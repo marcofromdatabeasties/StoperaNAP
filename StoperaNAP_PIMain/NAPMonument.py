@@ -67,6 +67,7 @@ class NAPMonument:
         self.pressureSensor = PressureSensor()
         self.rws = RWS()
         self.starttime = datetime.now() - timedelta(days=1)
+        self.phonetime = datetime.now()
         ET.phoneHome("Wake up")
        
     def start(self):
@@ -84,7 +85,8 @@ class NAPMonument:
                                       constants.VL_53, constants.PUMP_53
                                       , self.pressureSensor, self.screen, self.rws, 2)
 
-        
+
+        #main loop
         while True:
             try:
                 if self.starttime + timedelta(days=1) < datetime.now():
@@ -113,6 +115,12 @@ class NAPMonument:
                         and self.ping(constants.WaterData["NOS"])):
                     #nobody home, link down? let's reboot
                     os.system("sudo reboot")
+                    
+            if self.phonetime + timedelta(hours=1) < datetime.now():
+                ET.phoneHome("working....")
+                self.phonetime = datetime.now() + timedelta(hours=1)
+            
+            #adjust levels
             try:
                 #self.buttonsUp()
                 self.buttonTesting()
