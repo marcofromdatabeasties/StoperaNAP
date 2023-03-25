@@ -84,7 +84,6 @@ class NAPMonument:
                                       constants.VL_53, constants.PUMP_53
                                       , self.pressureSensor, self.screen, self.rws, 2)
 
-
         
         while True:
             try:
@@ -144,13 +143,7 @@ class NAPMonument:
            
     #obsolete function in case of interrupt troubles on-site
     def buttonTesting(self):
-        # GPIO.setmode(GPIO.BCM) 
-        # GPIO.setwarnings(False)
-        GPIO.setup(constants.BTN_SHUTDOWN, GPIO.IN, GPIO.PUD_UP)
-        GPIO.setup(constants.BTN_EMPTY, GPIO.IN, GPIO.PUD_UP) 
-        GPIO.setup(constants.BTN_NAP, GPIO.IN, GPIO.PUD_UP)
         time.sleep(0.02)
-        
         
         if GPIO.input(constants.BTN_SHUTDOWN) == GPIO.LOW:
             self.shutdown_h_now()
@@ -193,4 +186,12 @@ class NAPMonument:
         
         #and then check the response...
         return  response == 0
-            
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        GPIO.output(constants.VL_IJMUIDEN, GPIO.HIGH)
+        GPIO.output(constants.VL_VLISSINGEN, GPIO.HIGH)
+        GPIO.output(constants.VL_53, GPIO.HIGH)
+        
+        GPIO.output(constants.PUMP_IJMUIDEN, GPIO.HIGH)
+        GPIO.output(constants.PUMP_VLISSINGEN, GPIO.HIGH)
+        GPIO.output(constants.PUMP_53, GPIO.HIGH)

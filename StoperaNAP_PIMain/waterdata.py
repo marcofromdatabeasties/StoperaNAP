@@ -18,7 +18,7 @@ class RWS:
     minutes_10 = timedelta(minutes=10)
     result = {}
     catalogus = {}
-    catalogus_time = datetime.now() - minutes_10
+    catalogus_time = {}
     
     #Note checken of GPIO werkt.
     
@@ -52,18 +52,12 @@ class RWS:
         day = datetime.today().weekday()
         hour = currenttime.hour
         if self.isEmptying(hour, day):
-            self.catalogus_time = datetime.now() + self.minutes_10
             return constants.NAP_COLUMN_LEVEL
 
-        #get old level in case of problems        
-        previous_level = constants.NAP_COLUMN_LEVEL
-        if (measure_location in self.result.keys()):
-            previous_level = self.result[measure_location]
-
-        #when new data is exected retreive data        
-        if datetime.now() > self.catalogus_time:
-            self.catalogus_time = datetime.now() + self.minutes_10
-            self.result[measure_location] = constants.NAP_COLUMN_LEVEL
+        #when new data is exected retreive data
+        #test        
+        if (datetime.now() > self.catalogus_time[measure_location] 
+                or (not measure_location in self.catalogus_time.keys())):
             
             loc = self.getLocation(measure_location);
             if loc != False:
@@ -85,14 +79,14 @@ class RWS:
                         doc = json.loads(body.decode("utf-8"))
                         observations = doc['WaarnemingenLijst'][0]
                         measurements = observations['MetingenLijst'][0]
-                        self.catalogus_time = datetime.now() + self.minutes_10
+                        self.catalogus_time[measure_location] = datetime.now() + self.minutes_10
                         measurement = measurements['Meetwaarde']
                         value = measurement['Waarde_Numeriek'] / 100 # to meters
                         self.result[measure_location] = value 
                         ET.phoneHome("OK, retrieved new waterlevel for %s" % measure_location)
                         return value
 
-        return previous_level
+        return self.result[measure_location]
         
     
     def getLocation(self, code):
