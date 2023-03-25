@@ -21,10 +21,6 @@ class RWS:
     
     #Note checken of GPIO werkt.
     
-    def isEmptying(self, hour, day):
-        #monday is 0
-        return ( not(5 <= hour <= 20)) or (day in {5, 6} and constants.NO_WEEKEND)
-    
     
     def getLastUpdate(self):
         return self.catalogus_time
@@ -47,11 +43,6 @@ class RWS:
             return False
     
     def getWaterLevel(self, measure_location):
-        currenttime = datetime.now().time()
-        day = datetime.today().weekday()
-        hour = currenttime.hour
-        if self.isEmptying(hour, day):
-            return constants.NAP_COLUMN_LEVEL
 
         #when new data is exected retreive data
         #test        

@@ -3,7 +3,7 @@
 """
 Created on Wed Oct 20 13:35:01 2021
 
-@author: ubuntu
+@author: Marco
 
 This file holds the water columns type
 
@@ -40,10 +40,19 @@ class WaterColumn:
         self.rws = rws
         self.screenRow = screenRow
         
+    def isEmptying(self, hour, day):
+         #monday is 0
+         return ( not(5 <= hour <= 20)) or (day in {5, 6} and constants.NO_WEEKEND)
+    
     def getWaterLevel(self):
         if (self.zero):
             return 0.0
         if (self.empty):
+            return constants.NAP_COLUMN_LEVEL
+        currenttime = datetime.now().time()
+        day = datetime.today().weekday()
+        hour = currenttime.hour
+        if self.isEmptying(hour, day):
             return constants.NAP_COLUMN_LEVEL
         return self.rws.getWaterLevel(self.measure_location)
     
@@ -100,6 +109,11 @@ class WaterColumn1953 (WaterColumn):
         if (self.zero):
             return 0
         if (self.empty):
+            return constants.NAP_COLUMN_LEVEL
+        currenttime = datetime.now().time()
+        day = datetime.today().weekday()
+        hour = currenttime.hour
+        if self.isEmptying(hour, day):
             return constants.NAP_COLUMN_LEVEL
         if self.start_time + timedelta(minutes=(constants.HALF_CYCLE_TIME_1953 * 2)) < datetime.now():
                 self.start_time = datetime.now()
