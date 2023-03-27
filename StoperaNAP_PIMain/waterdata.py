@@ -46,8 +46,11 @@ class RWS:
 
         #when new data is exected retreive data
         #test        
-        if (datetime.now() > self.catalogus_time[measure_location] 
-                or (not measure_location in self.catalogus_time.keys())):
+        if (not measure_location in self.catalogus_time.keys()):
+            #sentinel
+            self.catalogus_time[measure_location] = datetime.now() - self.minutes_10
+        
+        if (datetime.now() > self.catalogus_time[measure_location]):
             
             loc = self.getLocation(measure_location);
             if loc != False:
