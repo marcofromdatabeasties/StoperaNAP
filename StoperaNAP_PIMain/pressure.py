@@ -29,7 +29,7 @@ class PressureSensor:
 
         #4mA minimal current of pressure sensor (gets 0.8v ).
         #30mA max current is 4v
-        logging.info( "Reading ADS %d value %f" % raw,  self.value)
+        logging.info( "Reading ADS %d value %f" % (raw,  self.value))
         return (self.value* 3.25 -2.59), True
     
     def getColumnLevelRaw(self, channel):
@@ -41,7 +41,7 @@ class PressureSensor:
 
         #4mA minimal current of pressure sensor (gets 0.8v ).
         #30mA max current is 4v
-        logging.info( "Reading ADS %d value %f" % value)
+        logging.info( "Reading ADS %d value %f" % (raw, self.value))
         return (value* 3.25 -2.59), value, True
     
 if __name__ == "__main__":
