@@ -54,7 +54,8 @@ if __name__ == "__main__":
     GPIO.setup(constants.BTN_MANUAL, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
     
     while True:
-        if not GPIO.input(constants.BTN_MANUAL):
+        val = GPIO.input(constants.BTN_SELECT)
+        if not val:
             print('Button Pressed')
             time.sleep(0.2)
         
