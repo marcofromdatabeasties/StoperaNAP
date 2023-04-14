@@ -52,11 +52,12 @@ if __name__ == "__main__":
     GPIO.setup(constants.BTN_SELECT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(constants.BTN_DO, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
     GPIO.setup(constants.BTN_MANUAL, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
-    
+    i=0
     while True:
-        val = GPIO.input(constants.BTN_MANUAL)
+        i = i + 1
+        val = GPIO.input(constants.BTN_DO)
         if not val:
-            print('Button Pressed')
+            print('Button Pressed %d' % i)
             time.sleep(0.2)
         
              
