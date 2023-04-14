@@ -88,11 +88,11 @@ class NAPMonument:
                                       constants.VL_53, constants.PUMP_53
                                       , self.pressureSensor, self.screen, self.rws, 2)
 
-
+        self.screen.writeInfoToScreen("Loop")
         #main loop
         while True:
             try:
-                if self.starttime + timedelta(days=1) < datetime.now() and self.running:
+                if self.starttime + timedelta(days=1) < datetime.now() :
                     self.starttime = datetime.now()
                     req = urllib.request.Request(constants.IP_API)
                     ip = ""
