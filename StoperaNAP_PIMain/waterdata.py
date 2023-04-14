@@ -36,14 +36,16 @@ class RWS:
         
         try:
 
-        with urllib.request.urlopen(req, jsondataasbytes) as response:
-            body = response.read()
-            if (response.status == 200):
-                result = json.loads(body.decode("utf-8"))
-                self.catalogus = result['LocatieLijst']
-                return True
+            with urllib.request.urlopen(req, jsondataasbytes) as response:
+                body = response.read()
+                if (response.status == 200):
+                    result = json.loads(body.decode("utf-8"))
+                    self.catalogus = result['LocatieLijst']
+                    return True
+                return False
+        except Exception as e:
+            logging.exception("%s", self.Vlissingen.measure_location + str(e))
             return False
-        
     
     def getWaterLevel(self, measure_location):
         #when new data is expected retreive data       
