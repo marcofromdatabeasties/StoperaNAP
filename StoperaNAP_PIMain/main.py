@@ -25,6 +25,7 @@ def main():
     
     app_log.addHandler(my_handler)
     
+    logging.info("Starting")
     #start monument
     try: 
         monument = NAPMonument()
@@ -34,7 +35,7 @@ def main():
     
 
 if __name__ == "__main__":
-    logging.warning("Starting")
+    
     main()
     
     
