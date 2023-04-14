@@ -157,9 +157,8 @@ class NAPMonument:
                 #select manuele selectie modus
                 if (self.running):
                     self.running = False
-                
-                   
                     self.screen.clear()
+                    self.screen.writeInfoToScreen("Handm ....")
                 if not GPIO.input(constants.BTN_SELECT) and GPIO.input(constants.BTN_DO):
                     self.doGPIO( GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH)
                     #clear screen

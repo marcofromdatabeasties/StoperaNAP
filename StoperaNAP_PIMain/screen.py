@@ -61,7 +61,7 @@ class LCD:
     def clear(self):
         try:
             self.lcd.clear()
-            time.sleep(0.05)
+            time.sleep(0.10)
         except Exception as e:
             logging.exception("Screen cleared: " + str(e))
         
