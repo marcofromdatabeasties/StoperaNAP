@@ -61,7 +61,7 @@ class NAPMonument:
                         and self.ping(constants.WaterData["AWS"])
                         and self.ping(constants.WaterData["NOS"])):
             for i in range(0,6):
-                self.screen.writeInfoToScreen("Wcht %s min gn dta" % str(5-i))
+                self.screen.writeInfoToScreen("Wcht %s min gn dta" % str(6-i))
                 time.sleep(60) #sleep 5 minutes
                 
         self.pressureSensor = PressureSensor()
