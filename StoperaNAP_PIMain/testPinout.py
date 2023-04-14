@@ -22,31 +22,41 @@ signal.signal(signal.SIGINT, signal_handler)
 
 if __name__ == "__main__":
 
-    GPIO.setmode(GPIO.BCM) 
-    GPIO.setwarnings(True)
-    GPIO.setup(constants.PUMP_IJMUIDEN, GPIO.OUT)
-    GPIO.setup(constants.PUMP_VLISSINGEN, GPIO.OUT)
-    GPIO.setup(constants.VL_IJMUIDEN, GPIO.OUT)
-    GPIO.setup(constants.VL_VLISSINGEN, GPIO.OUT)
+    # GPIO.setmode(GPIO.BCM) 
+    # GPIO.setwarnings(True)
+    # GPIO.setup(constants.PUMP_IJMUIDEN, GPIO.OUT)
+    # GPIO.setup(constants.PUMP_VLISSINGEN, GPIO.OUT)
+    # GPIO.setup(constants.VL_IJMUIDEN, GPIO.OUT)
+    # GPIO.setup(constants.VL_VLISSINGEN, GPIO.OUT)
     
     
-    while (True):
+    # while (True):
                 
-         GPIO.output(constants.VL_IJMUIDEN, GPIO.HIGH)
-         GPIO.output(constants.VL_VLISSINGEN, GPIO.HIGH)
+    #      GPIO.output(constants.VL_IJMUIDEN, GPIO.HIGH)
+    #      GPIO.output(constants.VL_VLISSINGEN, GPIO.HIGH)
          
-         GPIO.output(constants.PUMP_IJMUIDEN, GPIO.HIGH)
-         GPIO.output(constants.PUMP_VLISSINGEN, GPIO.HIGH)
+    #      GPIO.output(constants.PUMP_IJMUIDEN, GPIO.HIGH)
+    #      GPIO.output(constants.PUMP_VLISSINGEN, GPIO.HIGH)
          
-         time.sleep(1)
+    #      time.sleep(1)
                  
-         GPIO.output(constants.VL_IJMUIDEN, GPIO.LOW)
-         GPIO.output(constants.VL_VLISSINGEN, GPIO.LOW)
+    #      GPIO.output(constants.VL_IJMUIDEN, GPIO.LOW)
+    #      GPIO.output(constants.VL_VLISSINGEN, GPIO.LOW)
          
-         GPIO.output(constants.PUMP_IJMUIDEN, GPIO.LOW)
-         GPIO.output(constants.PUMP_VLISSINGEN, GPIO.LOW)
+    #      GPIO.output(constants.PUMP_IJMUIDEN, GPIO.LOW)
+    #      GPIO.output(constants.PUMP_VLISSINGEN, GPIO.LOW)
 
-         time.sleep(1)
+    #      time.sleep(1)
                  
-         
+    
+    GPIO.setup(constants.BTN_SELECT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(constants.BTN_DO, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+    GPIO.setup(constants.BTN_MANUAL, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+    
+    while True:
+        if not GPIO.input(constants.BTN_MANUAL):
+            print('Button Pressed')
+            time.sleep(0.2)
+        
+             
 
