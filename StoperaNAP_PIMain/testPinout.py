@@ -56,7 +56,7 @@ if __name__ == "__main__":
     while True:
         i = i + 1
         val = GPIO.input(constants.BTN_DO)
-        if not GPIO.input(constants.BTN_DO) and GPIO.int(constants.BTN_SELECT):
+        if not GPIO.input(constants.BTN_DO) and GPIO.input(constants.BTN_SELECT):
             print('Button Pressed %d' % i)
             time.sleep(0.2)
         
