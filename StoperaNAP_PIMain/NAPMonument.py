@@ -47,9 +47,9 @@ class NAPMonument:
         GPIO.output(constants.PUMP_53, GPIO.HIGH)
         
         
-        GPIO.setup(constants.BTN_SELECT, GPIO.IN, GPIO.PUD_UP)
-        GPIO.setup(constants.BTN_DO, GPIO.IN, GPIO.PUD_UP) 
-        GPIO.setup(constants.BTN_MANUAL, GPIO.IN, GPIO.PUD_UP) 
+        GPIO.setup(constants.BTN_SELECT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(constants.BTN_DO, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+        GPIO.setup(constants.BTN_MANUAL, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
     
     def __init__(self):
         self.buttonsUp()
@@ -123,7 +123,7 @@ class NAPMonument:
                 ET.phoneHome("working....")
                 self.phonetime = datetime.now() + timedelta(hours=1)
             #normal operation
-            if GPIO.input(constants.BTN_MANUAL) == GPIO.HIGH: 
+            if GPIO.input(constants.BTN_MANUAL): 
                 if not self.running:
                     self.doGPIO( GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH)
                     self.screen.clear()
@@ -159,7 +159,8 @@ class NAPMonument:
                     self.running = False
                     self.doGPIO( GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH)
                     self.screen.clear()
-                if GPIO.input(constants.BTN_SELECT) == GPIO.LOW and GPIO.input(constants.BTN_DO) == GPIO.HIGH:
+                
+                if not GPIO.input(constants.BTN_SELECT) and GPIO.input(constants.BTN_DO):
                     self.doGPIO( GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH)
                     #clear screen
                     try:
@@ -188,7 +189,7 @@ class NAPMonument:
                     except Exception as e:
                         logging.exception("%s", str(e))
                 #select doe vullen of legen
-                if  GPIO.input(constants.BTN_DO) == GPIO.LOW and GPIO.input(constants.BTN_SELECT) == GPIO.HIGH:
+                if  not GPIO.input(constants.BTN_DO) and GPIO.input(constants.BTN_SELECT):
                     try:
                         self.refresh = (self.refresh + 1) % 33
                         if not self.refresh:
