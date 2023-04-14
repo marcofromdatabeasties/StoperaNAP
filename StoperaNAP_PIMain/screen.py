@@ -8,7 +8,7 @@ Created on Sat Oct 23 21:45:15 2021
 
 from RPLCD.i2c import CharLCD
 import time
-
+import logging
 
 class LCD:
     ms = time.time()
@@ -43,6 +43,10 @@ class LCD:
         if self.times % 33 == 0:
             self.lcd.cursor_mode = 'hide'
             self.clear()
+            
+    def writeManualToScreen(self, row, text):
+        self.lcd.cursor_pos = (row, 0)
+        self.lcd.write_string((("{text}" + (' ' * 19)).format(text = text[:18])[:18]))
     
         
     def writeInfoToScreen(self, message):
@@ -50,9 +54,10 @@ class LCD:
         self.lcd.write_string((("{message}" + (' ' * 19)).format(message = message[:18])[:18]))
         
     def clear(self):
-        self.lcd.clear()
-        #self.lcd.cursor_pos = (3, 0)
-        #self.lcd.write_string("NAP/RWS/Stopera"[:18])
+        try:
+            self.lcd.clear()
+        except Exception as e:
+            logging.exception("Screen cleared: " + str(e))
         
         
         

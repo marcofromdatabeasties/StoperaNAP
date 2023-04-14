@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="297mm"
+   height="210mm"
+   viewBox="0 0 297 210"
+   version="1.1"
+   id="svg5"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs2">
+    <marker
+       style="overflow:visible"
+       id="RoundedArrow"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="22.135"
+       markerHeight="21.398014"
+       viewBox="0 0 6.1347524 5.9304951"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="m -0.21114562,-4.1055728 6.42229122,3.21114561 a 1,1 90 0 1 0,1.78885438 L -0.21114562,4.1055728 A 1.236068,1.236068 31.717474 0 1 -2,3 v -6 a 1.236068,1.236068 148.28253 0 1 1.78885438,-1.1055728 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path1367" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="RoundedArrow-3"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="21.135"
+       markerHeight="20.431311"
+       viewBox="0 0 6.1347524 5.9304951"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="m -0.21114562,-4.1055728 6.42229122,3.21114561 a 1,1 90 0 1 0,1.78885438 L -0.21114562,4.1055728 A 1.236068,1.236068 31.717474 0 1 -2,3 v -6 a 1.236068,1.236068 148.28253 0 1 1.78885438,-1.1055728 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path1367-5" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="RoundedArrow-2"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="22.135"
+       markerHeight="21.398014"
+       viewBox="0 0 6.1347524 5.9304951"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="m -0.21114562,-4.1055728 6.42229122,3.21114561 a 1,1 90 0 1 0,1.78885438 L -0.21114562,4.1055728 A 1.236068,1.236068 31.717474 0 1 -2,3 v -6 a 1.236068,1.236068 148.28253 0 1 1.78885438,-1.1055728 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path1367-9" />
+    </marker>
+  </defs>
+  <g
+     id="layer1">
+    <ellipse
+       style="fill:#000000;stroke-width:0.146168"
+       id="path237"
+       cx="23.764545"
+       cy="31.610563"
+       rx="6.938653"
+       ry="5.6546488" />
+    <ellipse
+       style="fill:#000000;stroke-width:0.146168"
+       id="ellipse351"
+       cx="41.858418"
+       cy="31.610563"
+       rx="6.938653"
+       ry="5.6546488" />
+    <ellipse
+       style="fill:#ff0000;stroke-width:0.146168"
+       id="ellipse351-6"
+       cx="59.952286"
+       cy="31.610563"
+       rx="6.938653"
+       ry="5.6546488" />
+    <rect
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.242793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1117"
+       width="83.028313"
+       height="27.60511"
+       x="78.879837"
+       y="15.680844"
+       rx="6.0209322"
+       ry="1.0525289" />
+    <rect
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.259387;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1117-7"
+       width="83.010834"
+       height="31.514177"
+       x="78.888573"
+       y="45.930965"
+       rx="6.0196648"
+       ry="1.2015737" />
+    <rect
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.259387;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1117-7-5"
+       width="83.010834"
+       height="31.514177"
+       x="78.888573"
+       y="80.09803"
+       rx="6.0196648"
+       ry="1.2015737" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.146168px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 23.764545,31.610563 0.65183,-2.359741"
+       id="path1270" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.503714;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#RoundedArrow)"
+       d="m 27.139751,32.207128 1.54075,-10.973822 55.158864,0.294653"
+       id="path1328" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.515385;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#RoundedArrow-2)"
+       d="m 41.89009,35.526533 1.150334,53.723235 41.182007,-1.442505"
+       id="path1328-1" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.586462;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#RoundedArrow-3)"
+       d="m 59.470785,35.742549 0.665091,17.390849 23.810272,-0.466954"
+       id="path1328-6" />
+    <text
+       xml:space="preserve"
+       style="font-size:5.91441px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.139711;stroke-dasharray:none;stroke-opacity:1"
+       x="127.98336"
+       y="26.62196"
+       id="text3545"><tspan
+         id="tspan3543"
+         style="fill:#000000;fill-opacity:1;stroke-width:0.139711;stroke-dasharray:none"
+         x="127.98336"
+         y="26.62196"><tspan
+   style="fill:#aa0000;fill-opacity:1;stroke:#d90000;stroke-opacity:1"
+   id="tspan4567">Stap 1:</tspan> Schakel over op </tspan><tspan
+         style="fill:#000000;fill-opacity:1;stroke-width:0.139711;stroke-dasharray:none"
+         x="128.80547"
+         y="34.014973"
+         id="tspan4429">handmatige bediening </tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:5.91441px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.139711;stroke-dasharray:none;stroke-opacity:1"
+       x="127.98336"
+       y="59.479237"
+       id="text3545-2"><tspan
+         style="fill:#000000;fill-opacity:1;stroke-width:0.139711;stroke-dasharray:none"
+         x="127.98336"
+         y="59.479237"
+         id="tspan4429-0">Stap 2: Selecteer wat er </tspan><tspan
+         style="fill:#000000;fill-opacity:1;stroke-width:0.139711;stroke-dasharray:none"
+         x="127.98336"
+         y="66.872246"
+         id="tspan4519">bedient moet worden.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:5.91441px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.139711;stroke-dasharray:none;stroke-opacity:1"
+       x="127.98336"
+       y="93.286507"
+       id="text3545-2-9"><tspan
+         style="fill:#000000;fill-opacity:1;stroke-width:0.139711;stroke-dasharray:none"
+         x="127.98336"
+         y="93.286507"
+         id="tspan4519-6">Stap 3: Activeer, situatie </tspan><tspan
+         style="fill:#000000;fill-opacity:1;stroke-width:0.139711;stroke-dasharray:none"
+         x="127.98336"
+         y="100.67952"
+         id="tspan4559">is aan of (na drukken) </tspan><tspan
+         style="fill:#000000;fill-opacity:1;stroke-width:0.139711;stroke-dasharray:none"
+         x="127.98336"
+         y="108.07253"
+         id="tspan4565">uit.</tspan></text>
+  </g>
+</svg>

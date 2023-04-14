@@ -33,8 +33,6 @@ class WaterColumn:
         self.measure_location = location
         self.pin_pump = pin_pump
         self.pin_valve = pin_valve
-        self.zero = False
-        self.empty = False
         self.pressureSensor = pressureSensor
         self.screen = screen
         self.rws = rws
@@ -45,10 +43,6 @@ class WaterColumn:
          return ( not(5 <= hour <= 20)) or (day in {5, 6} and constants.NO_WEEKEND)
     
     def getWaterLevel(self):
-        if (self.zero):
-            return 0.0
-        if (self.empty):
-            return constants.NAP_COLUMN_LEVEL
         currenttime = datetime.now().time()
         day = datetime.today().weekday()
         hour = currenttime.hour
@@ -56,17 +50,8 @@ class WaterColumn:
             return constants.NAP_COLUMN_LEVEL
         return self.rws.getWaterLevel(self.measure_location)
     
-    def setLevelToZero(self):
-        #only set when empty is false
-        self.zero = True
-    
-    def setLevelToEmpty(self):
-        #only set when zero  is false
-        self.empty = True
-        
-    def setToNormal(self):
-        self.zero = False
-        self.empty = False
+    def getCurrentWaterLevel(self):
+        return self.rws.getWaterLevel(self.measure_location)
             
     def runWorlds(self):
         #NAP start  + NAP level equals column height
@@ -106,10 +91,6 @@ class WaterColumn1953 (WaterColumn):
     start_time = datetime.now()
     
     def getWaterLevel(self):
-        if (self.zero):
-            return 0
-        if (self.empty):
-            return constants.NAP_COLUMN_LEVEL
         currenttime = datetime.now().time()
         day = datetime.today().weekday()
         hour = currenttime.hour

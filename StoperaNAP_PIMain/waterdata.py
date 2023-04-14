@@ -43,9 +43,7 @@ class RWS:
             return False
     
     def getWaterLevel(self, measure_location):
-
-        #when new data is exected retreive data
-        #test        
+        #when new data is expected retreive data       
         if (not measure_location in self.catalogus_time.keys()):
             #sentinel
             self.catalogus_time[measure_location] = datetime.now() - self.minutes_10
