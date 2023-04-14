@@ -70,7 +70,7 @@ class NAPMonument:
         self.phonetime = datetime.now()
         self.target = 0
         self.refresh = 1
-        self.running = False
+        self.running = True
         ET.phoneHome("Wake up")
        
     def start(self):

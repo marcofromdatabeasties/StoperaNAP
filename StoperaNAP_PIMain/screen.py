@@ -34,8 +34,9 @@ class LCD:
             text = text[:18]
             #print(text)
             self.lcd.cursor_pos = (screenRow, 0)
+            time.sleep(0.10)
             self.lcd.write_string(text)
-            time.sleep(0.05)
+            time.sleep(0.10)
             self.ms = time.time()
             self.lastRow = screenRow
             self.times += 1
@@ -46,16 +47,21 @@ class LCD:
             
     def writeManualToScreen(self, row, text):
         self.lcd.cursor_pos = (row, 0)
+        time.sleep(0.10)
         self.lcd.write_string((("{text}" + (' ' * 19)).format(text = text[:18])[:18]))
+        time.sleep(0.10)
     
         
     def writeInfoToScreen(self, message):
         self.lcd.cursor_pos = (3, 0)
+        time.sleep(0.10)
         self.lcd.write_string((("{message}" + (' ' * 19)).format(message = message[:18])[:18]))
+        time.sleep(0.10)
         
     def clear(self):
         try:
             self.lcd.clear()
+            time.sleep(0.05)
         except Exception as e:
             logging.exception("Screen cleared: " + str(e))
         
