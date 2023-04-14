@@ -22,7 +22,7 @@ signal.signal(signal.SIGINT, signal_handler)
 
 if __name__ == "__main__":
 
-    # GPIO.setmode(GPIO.BCM) 
+    GPIO.setmode(GPIO.BCM) 
     # GPIO.setwarnings(True)
     # GPIO.setup(constants.PUMP_IJMUIDEN, GPIO.OUT)
     # GPIO.setup(constants.PUMP_VLISSINGEN, GPIO.OUT)
