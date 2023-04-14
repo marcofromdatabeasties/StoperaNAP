@@ -52,6 +52,7 @@ class RWS:
         if (not measure_location in self.catalogus_time.keys()):
             #sentinel
             self.catalogus_time[measure_location] = datetime.now() - self.minutes_10
+            self.result[measure_location] = constants.NAP_COLUMN_LEVEL
         
         if (datetime.now() > self.catalogus_time[measure_location]):
             
