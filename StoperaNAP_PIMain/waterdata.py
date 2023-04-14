@@ -44,7 +44,7 @@ class RWS:
                     return True
                 return False
         except Exception as e:
-            logging.exception("%s", self.Vlissingen.measure_location + str(e))
+            logging.exception("%s", str(e))
             return False
     
     def getWaterLevel(self, measure_location):
