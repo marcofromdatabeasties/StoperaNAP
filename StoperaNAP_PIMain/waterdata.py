@@ -33,6 +33,8 @@ class RWS:
         jsondata = json.dumps(constants.WaterData['RetrieveCatalogusBody'])
         jsondataasbytes = jsondata.encode('utf-8')   # needs to be bytes
         req.add_header('Content-Length', len(jsondataasbytes))
+        
+        try:
 
         with urllib.request.urlopen(req, jsondataasbytes) as response:
             body = response.read()
@@ -41,6 +43,7 @@ class RWS:
                 self.catalogus = result['LocatieLijst']
                 return True
             return False
+        
     
     def getWaterLevel(self, measure_location):
         #when new data is expected retreive data       
@@ -102,8 +105,8 @@ if __name__ == "__main__":
     # print ( rws.isEmptying(22, 5))
     # print ( rws.isEmptying(22, 6))
     # print ( rws.isEmptying(8, 0))
-    #rws.getCatalogus()
-    #print(rws.getCatalogus())
+    rws.getCatalogus()
+    print(rws.getCatalogus())
     #for location in rws.catalogus:
     #            if location["Code"].startswith("IJM" ):
     #               print( location)
