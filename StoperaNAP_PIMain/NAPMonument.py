@@ -157,9 +157,9 @@ class NAPMonument:
                 #select manuele selectie modus
                 if (self.running):
                     self.running = False
-                    self.doGPIO( GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH)
-                    self.screen.clear()
                 
+                   
+                    self.screen.clear()
                 if not GPIO.input(constants.BTN_SELECT) and GPIO.input(constants.BTN_DO):
                     self.doGPIO( GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH)
                     #clear screen
@@ -238,6 +238,9 @@ class NAPMonument:
                                             level, volt, ok = self.pressureSensor.getColumnLevelRaw(constants.PR_IJMUIDEN)
                                             self.writeManualToScreen(0, "IJMN{level:0.2f}cm/{volt:0.2f}v".format( 
                                                 level= level, volt = volt))
+                else:
+                    self.doGPIO( GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH)
+                    
                                             
     def writeManualToScreen(self, row, text):
         try:
