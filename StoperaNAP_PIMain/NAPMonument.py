@@ -189,7 +189,7 @@ class NAPMonument:
                     except Exception as e:
                         logging.exception("%s", str(e))
                 #select doe vullen of legen
-                if  not GPIO.input(constants.BTN_DO) and GPIO.input(constants.BTN_SELECT):
+                if  not GPIO.input(constants.BTN_DO):
                     try:
                         self.refresh = (self.refresh + 1) % 33
                         if not self.refresh:
